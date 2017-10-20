@@ -5,14 +5,11 @@
 //#include "lexico.c"
 
 int main() {
-	int opcao, valor;
 
 	fp = abrirArquivo("TESTE.txt");
 	analexico(fp);
     fclose(fp);
     printf("ENDPROGRAM\n");
-
-
     system("PAUSE");
 
     return 0;
