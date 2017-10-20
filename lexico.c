@@ -5,8 +5,6 @@
 #include "lexico.h"
 #define TAM 1001
 
-//FILE *fp;
-
 int linha = 1;
 char pReservada[100][11] = {
     {"semretorno"},
@@ -49,7 +47,7 @@ char pSinais[100][18] = {
 
 
 void error() {
-    printf("Erro lexico na linha %d\n", linha);
+    fprintf(f_out,"Erro lexico na linha %d\n", linha);
     exit(1);
 }
 
@@ -65,6 +63,17 @@ FILE * abrirArquivo(char nomeArquivo[]) {
     }
 }
 
+FILE * salvarArquivo(char nomeArquivo[]) {
+    FILE *f_out;
+    if ((f_out = fopen(nomeArquivo, "w")) != NULL) {
+        return f_out;
+    } else {
+
+        printf("Erro ao abrir o arquivo %d", errno);
+        exit(1);
+    }
+}
+
 TOKEN montaToken(int cat, char token[], char ch, int pos) {
     int convert;
     float convert2;
@@ -73,21 +82,21 @@ TOKEN montaToken(int cat, char token[], char ch, int pos) {
     switch (cat) {
         case ID:
         {
-            printf("<ID, %s>\n", token);
+            fprintf(f_out,"<ID, %s>\n", token);
             estruturaToken.cat = ID;
             strcpy(estruturaToken.tipo.lexema, token);
             return estruturaToken;
         }
         case PR:
         {
-            printf("<PR, %s>\n", pReservada[pos]);
+            fprintf(f_out,"<PR, %s>\n", pReservada[pos]);
             estruturaToken.cat = PR;
             estruturaToken.tipo.codigo = pos;
             return estruturaToken;
         }
         case SN:
         {
-            printf("<SN, %s>\n", pSinais[pos]);
+            fprintf(f_out,"<SN, %s>\n", pSinais[pos]);
             estruturaToken.cat = SN;
             estruturaToken.tipo.codigo = pos;
 
@@ -96,7 +105,7 @@ TOKEN montaToken(int cat, char token[], char ch, int pos) {
         case CT_I:
         {
             convert = atoi(token);
-            printf("<CT_I, %d>\n", convert);
+            fprintf(f_out,"<CT_I, %d>\n", convert);
             estruturaToken.cat = CT_I;
             estruturaToken.tipo.valor_int = convert;
             return estruturaToken;
@@ -104,21 +113,21 @@ TOKEN montaToken(int cat, char token[], char ch, int pos) {
         case CT_R:
         {
             convert2 = atof(token);
-            printf("<CT_R, %.1f>\n", convert2);
+            fprintf(f_out,"<CT_R, %.1f>\n", convert2);
             estruturaToken.cat = CT_R;
             estruturaToken.tipo.valor_real = convert2;
             return estruturaToken;
         }
         case CT_C:
         {
-            printf("<CT_C,%s>\n", token);
+            fprintf(f_out,"<CT_C,%s>\n", token);
             estruturaToken.cat = CT_C;
             strcpy(estruturaToken.tipo.lexema, token);
             return estruturaToken;
         }
         case CT_CD:
         {
-            printf("<CT_CD, %s>\n", token);
+            fprintf(f_out,"<CT_CD, %s>\n", token);
             estruturaToken.cat = CT_CD;
             strcpy(estruturaToken.tipo.lexema, token);
             return estruturaToken;
@@ -148,9 +157,7 @@ int searchPR(char token[]) {
     }
 }
 
-
-
-TOKEN analexico(FILE *fp) {
+TOKEN analexico(FILE *fp, FILE *f_out) {
     int estado = 0;
     char ch;
     char tokenAux;
@@ -183,7 +190,7 @@ TOKEN analexico(FILE *fp) {
                 if ((ch == '\n')) {
                     estado = 0;
                     linha++;
-                    printf("LINHA %d\n", linha);
+                    fprintf(f_out,"LINHA %d\n", linha);
                 }
                 if (isdigit(ch)) {
                     estado = 2;

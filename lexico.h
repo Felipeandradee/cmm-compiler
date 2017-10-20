@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 FILE *fp;
+FILE *f_out;
 int linha;
 
 /*
@@ -78,6 +79,7 @@ char ch;
 TOKEN tk;
 
 FILE * abrirArquivo(char nomeArquivo[]);
+FILE * salvarArquivo(char nomeArquivo[]);
 
 //TOKEN montaToken(int cat, char token[], char ch, int pos);
 
@@ -85,6 +87,6 @@ int searchPR(char token[]);
 
 void error();
 
-TOKEN analexico(FILE *fp);
+TOKEN analexico(FILE *fp, FILE *f_out);
 
 #endif
