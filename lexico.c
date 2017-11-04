@@ -166,7 +166,10 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
     int pos = 0;
     TOKEN estruturaToken;
 
-    while (1) {
+    while (ch != EOF) {
+        if ((ch == '\n'))
+            fprintf(f_out,"LINHA %d\n", linha);
+
 
         switch (estado) {
             case 0:
@@ -190,7 +193,7 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
                 if ((ch == '\n')) {
                     estado = 0;
                     linha++;
-                    fprintf(f_out,"LINHA %d\n", linha);
+                    //fprintf(f_out,"LINHA %d\n", linha);
                 }
                 if (isdigit(ch)) {
                     estado = 2;
