@@ -39,8 +39,6 @@ typedef enum {
             PONTO_VIRGULA,
             ABRE_PARENTESE,
             FECHA_PARENTESE,
-            ABRE_COLCHETES,
-            FECHA_COLCHETES,
             ABRE_CHAVES,
             FECHA_CHAVES
 } sinais;
@@ -57,7 +55,8 @@ typedef enum {
         SENAO,
         ENQUANTO,
         PARA,
-        RETORNE
+        RETORNE,
+        PROTOTIPO
 } PalavraReservada;
 
 extern char pReservada[100][11];
@@ -76,7 +75,7 @@ typedef struct t {
 
 int posPR;
 char ch;
-TOKEN tk;
+TOKEN token;
 
 FILE * abrirArquivo(char nomeArquivo[]);
 FILE * salvarArquivo(char nomeArquivo[]);
@@ -87,6 +86,6 @@ int searchPR(char token[]);
 
 void error();
 
-TOKEN analexico(FILE *fp, FILE *f_out);
+void analexico();
 
 #endif

@@ -17,7 +17,8 @@ char pReservada[100][11] = {
     {"senao"},
     {"enquanto"},
     {"para"},
-    {"retorne"}
+    {"retorne"},
+    {"prototipo"}
 };
 
 char pSinais[100][18] = {
@@ -39,8 +40,6 @@ char pSinais[100][18] = {
     {"ponto_virgula"},
     {"abre_parenteses"},
     {"fecha_parenteses"},
-    {"abre_colchetes"},
-    {"fecha_colchetes"},
     {"abre_chaves"},
     {"fecha_chaves"}
 };
@@ -74,64 +73,53 @@ FILE * salvarArquivo(char nomeArquivo[]) {
     }
 }
 
-TOKEN montaToken(int cat, char token[], char ch, int pos) {
+void montaToken(int cat, char lexema[], char ch, int pos) {
     int convert;
     float convert2;
-    TOKEN estruturaToken;
 
     switch (cat) {
         case ID:
         {
             fprintf(f_out,"<ID, %s>\n", token);
-            estruturaToken.cat = ID;
-            strcpy(estruturaToken.tipo.lexema, token);
-            return estruturaToken;
+            token.cat = ID;
+            strcpy(token.tipo.lexema, lexema);
         }
         case PR:
         {
             fprintf(f_out,"<PR, %s>\n", pReservada[pos]);
-            estruturaToken.cat = PR;
-            estruturaToken.tipo.codigo = pos;
-            return estruturaToken;
+            token.cat = PR;
+            token.tipo.codigo = pos;
         }
         case SN:
         {
             fprintf(f_out,"<SN, %s>\n", pSinais[pos]);
-            estruturaToken.cat = SN;
-            estruturaToken.tipo.codigo = pos;
-
-            return estruturaToken;
+            token.cat = SN;
+            token.tipo.codigo = pos;
         }
         case CT_I:
         {
-            convert = atoi(token);
+            convert = atoi(lexema);
             fprintf(f_out,"<CT_I, %d>\n", convert);
-            estruturaToken.cat = CT_I;
-            estruturaToken.tipo.valor_int = convert;
-            return estruturaToken;
+            token.cat = CT_I;
+            token.tipo.valor_int = convert;
         }
         case CT_R:
         {
-            convert2 = atof(token);
+            convert2 = atof(lexema);
             fprintf(f_out,"<CT_R, %.1f>\n", convert2);
-            estruturaToken.cat = CT_R;
-            estruturaToken.tipo.valor_real = convert2;
-            return estruturaToken;
+            token.cat = CT_R;
+            token.tipo.valor_real = convert2;
         }
         case CT_C:
         {
             fprintf(f_out,"<CT_C,%s>\n", token);
-            estruturaToken.cat = CT_C;
-            strcpy(estruturaToken.tipo.lexema, token);
-            return estruturaToken;
-        }
+            token.cat = CT_C;
+            strcpy(token.tipo.lexema, lexema);        }
         case CT_CD:
         {
             fprintf(f_out,"<CT_CD, %s>\n", token);
-            estruturaToken.cat = CT_CD;
-            strcpy(estruturaToken.tipo.lexema, token);
-            return estruturaToken;
-        }
+            token.cat = CT_CD;
+            strcpy(token.tipo.lexema, lexema);        }
     }
 }
 
@@ -157,14 +145,13 @@ int searchPR(char token[]) {
     }
 }
 
-TOKEN analexico(FILE *fp, FILE *f_out) {
+void analexico() {
     int estado = 0;
     char ch;
     char tokenAux;
     char token[TAM];
     int cont = 0;
     int pos = 0;
-    TOKEN estruturaToken;
 
     while (ch != EOF) {
         if ((ch == '\n'))
@@ -193,7 +180,6 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
                 if ((ch == '\n')) {
                     estado = 0;
                     linha++;
-                    //fprintf(f_out,"LINHA %d\n", linha);
                 }
                 if (isdigit(ch)) {
                     estado = 2;
@@ -215,7 +201,7 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
                     token[cont] = ch;
                     cont++;
                 }
-                if (ch == '\/') {
+                if (ch == '/') {
                     estado = 16;
                     token[cont] = ch;
                     cont++;
@@ -241,9 +227,9 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
                     cont++;
                 }
 
-                if ((ch == '[')||(ch == ']')||(ch == '{')||(ch == '}')||
-                    (ch == '(')||(ch == ')')||(ch == '+')||(ch == '-')||
-                    (ch == '*')||(ch == ',')||(ch == ';')) {
+                if ((ch == '{')||(ch == '}')||(ch == '(')
+                    ||(ch == ')')||(ch == '+')||(ch == '-')
+                    ||(ch == '*')||(ch == ',')||(ch == ';')) {
                     estado = 32;
                 }
                 if (ch == '&') {
@@ -288,14 +274,14 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             {
                 int lpr = searchPR(token);
                 if(lpr){
-                    estruturaToken = montaToken(PR, token, '\0', lpr);
+                    montaToken(PR, token, '\0', lpr);
                 }else{
-                    estruturaToken = montaToken(ID, token, '\0', 0);
+                    montaToken(ID, token, '\0', 0);
                 }
 
                 estado = 0;
-                ungetc(ch, fp);break;
-                return estruturaToken;
+                ungetc(ch, fp);
+                break;
             }
             case 4:
             {
@@ -323,17 +309,17 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 6:
             {
-                estruturaToken = montaToken(CT_R, token, '\0', 0);
+                montaToken(CT_R, token, '\0', 0);
                 estado = 0;
-                ungetc(ch, fp);break;
-                return estruturaToken;
+                ungetc(ch, fp);
+                break;
             }
             case 7:
             {
-                estruturaToken = montaToken(CT_I, token, '\0', 0);
+                montaToken(CT_I, token, '\0', 0);
                 estado = 0;
-                ungetc(ch, fp);break;
-                return estruturaToken;
+                ungetc(ch, fp);
+                break;
             }
             case 8:
             {
@@ -368,9 +354,9 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 10:
             {
-                estruturaToken = montaToken(CT_C, token, tokenAux, 0);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(CT_C, token, tokenAux, 0);
+                estado = 0;
+                break;
             }
             case 11:
             {
@@ -418,9 +404,9 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 15:
             {
-                estruturaToken = montaToken(CT_CD, token, '\0', pos);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(CT_CD, token, '\0', pos);
+                estado = 0;
+                break;
             }
             case 16:
             {
@@ -484,15 +470,15 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 21:
             {
-                estruturaToken = montaToken(SN, "=", '\0', IGUAL);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(SN, "=", '\0', IGUAL);
+                estado = 0;
+                break;
             }
             case 22:
             {
-                estruturaToken = montaToken(SN, "==", '\0', ATRIBUICAO);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(SN, "==", '\0', ATRIBUICAO);
+                estado = 0;
+                break;
             }
             case 23:
             {
@@ -508,15 +494,15 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 24:
             {
-                estruturaToken = montaToken(SN, "!", '\0', NOT);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(SN, "!", '\0', NOT);
+                estado = 0;
+                break;
             }
             case 25:
             {
-                estruturaToken = montaToken(SN, "!=", '\0', DIFERENTE);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(SN, "!=", '\0', DIFERENTE);
+                estado = 0;
+                break;
             }
             case 26:
             {
@@ -532,17 +518,17 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 27:
             {
-                estruturaToken = montaToken(SN, ">", '\0', MAIOR);
+                montaToken(SN, ">", '\0', MAIOR);
                 estado = 0;
-                ungetc(ch, fp);break;
-                return estruturaToken;
+                ungetc(ch, fp);
+                break;
             }
             case 28:
             {
-                estruturaToken = montaToken(SN, ">=", '\0', MAIORIGUAL);
+                montaToken(SN, ">=", '\0', MAIORIGUAL);
                 estado = 0;
-                ungetc(ch, fp);break;
-                return estruturaToken;
+                ungetc(ch, fp);
+                break;
             }
             case 29:
             {
@@ -558,49 +544,45 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 30:
             {
-                estruturaToken = montaToken(SN, "-", '\0', MENOR);
+                montaToken(SN, "-", '\0', MENOR);
                 estado = 0;
-                ungetc(ch, fp);break;
-                return estruturaToken;
+                ungetc(ch, fp);
+                break;
             }
             case 31:
             {
-                estruturaToken = montaToken(SN, "<=", '\0', MENORIGUAL);
-                estado = 0;break;
-                return estruturaToken;
+                montaToken(SN, "<=", '\0', MENORIGUAL);
+                estado = 0;
+                break;
             }
             case 32:
             {
                 char str[2];
                 str[0] =ch;
                 str[1] ='\0';
-                if(ch == '['){
-                    estruturaToken = montaToken(SN, str, '\0', ABRE_COLCHETES);
-                }else if(ch == ']'){
-                    estruturaToken = montaToken(SN, str, '\0', FECHA_COLCHETES);
-                }else if(ch == '{'){
-                    estruturaToken = montaToken(SN, str, '\0', ABRE_CHAVES);
+                if(ch == '{'){
+                    montaToken(SN, str, '\0', ABRE_CHAVES);
                 }else if(ch == '}'){
-                    estruturaToken = montaToken(SN, str, '\0', FECHA_CHAVES);
+                    montaToken(SN, str, '\0', FECHA_CHAVES);
                 }else if(ch == '('){
-                    estruturaToken = montaToken(SN, str, '\0', ABRE_PARENTESE);
+                    montaToken(SN, str, '\0', ABRE_PARENTESE);
                 }else if(ch == ')'){
-                    estruturaToken = montaToken(SN, str, '\0', FECHA_PARENTESE);
+                     montaToken(SN, str, '\0', FECHA_PARENTESE);
                 }else if(ch == '+'){
-                    estruturaToken = montaToken(SN, str, '\0', SOMA);
+                    montaToken(SN, str, '\0', SOMA);
                 }else if(ch == '-'){
-                    estruturaToken = montaToken(SN, str, '\0', SUBTRACAO);
+                    montaToken(SN, str, '\0', SUBTRACAO);
                 }else if(ch == '*'){
-                    estruturaToken = montaToken(SN, str, '\0', MULTIPLICACAO);
+                    montaToken(SN, str, '\0', MULTIPLICACAO);
                 }else if(ch == ','){
-                    estruturaToken = montaToken(SN, str, '\0', VIRGULA);
+                    montaToken(SN, str, '\0', VIRGULA);
                 }else if(ch == ';'){
-                    estruturaToken = montaToken(SN, str, '\0', PONTO_VIRGULA);
+                    montaToken(SN, str, '\0', PONTO_VIRGULA);
                 }else{
                     error();
                 }
-                estado = 0;break;
-                return estruturaToken;
+                estado = 0;
+                break;
             }
             case 33:
             {
@@ -616,10 +598,10 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 34:
             {
-                estruturaToken = montaToken(SN, "&&", '\0', AND);
-                estado = 0;break;
-                return estruturaToken;
-            }
+                montaToken(SN, "&&", '\0', AND);
+                estado = 0;
+                break;
+                            }
             case 35:
             {
                 ch = getc(fp);
@@ -634,10 +616,9 @@ TOKEN analexico(FILE *fp, FILE *f_out) {
             }
             case 36:
             {
-                estruturaToken = montaToken(SN, "||", '\0', OR);
-                estado = 0;break;
-                return estruturaToken;
-            }
+                montaToken(SN, "||", '\0', OR);
+                estado = 0;
+                break;            }
         }
     }
 }
