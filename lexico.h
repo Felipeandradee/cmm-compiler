@@ -75,7 +75,8 @@ typedef struct t {
 
 int posPR;
 char ch;
-TOKEN token;
+TOKEN TNext;
+//void error_lexico();
 
 FILE * abrirArquivo(char nomeArquivo[]);
 FILE * salvarArquivo(char nomeArquivo[]);
@@ -84,7 +85,7 @@ FILE * salvarArquivo(char nomeArquivo[]);
 
 int searchPR(char token[]);
 
-void error();
+
 
 void analexico();
 

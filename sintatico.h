@@ -6,6 +6,7 @@
 #include <string.h>
 #include "lexico.h"
 
+
 //estrutura boolean
 typedef
    enum{TRUE=1,FALSE=0}
@@ -43,5 +44,12 @@ char nome_func[15];
 
 //Tabela de simbolos.
 tabela tabela_Simbolos[1000];
+
+Boolean expr();
+Boolean fator();
+Boolean op_rel();
+Boolean expr_simp();
+Boolean termo();
+void prog();
 
 #endif // SINTATICO_H_INCLUDED

@@ -45,7 +45,7 @@ char pSinais[100][18] = {
 };
 
 
-void error() {
+void error_lexico() {
     fprintf(f_out,"Erro lexico na linha %d\n", linha);
     exit(1);
 }
@@ -80,57 +80,66 @@ void montaToken(int cat, char lexema[], char ch, int pos) {
     switch (cat) {
         case ID:
         {
-            fprintf(f_out,"<ID, %s>\n", token);
-            token.cat = ID;
-            strcpy(token.tipo.lexema, lexema);
+//            fprintf(f_out,"<ID, %s>\n", lexema);
+            TNext.cat = ID;
+            strcpy(TNext.tipo.lexema, lexema);
+            break;
         }
         case PR:
         {
-            fprintf(f_out,"<PR, %s>\n", pReservada[pos]);
-            token.cat = PR;
-            token.tipo.codigo = pos;
+//            fprintf(f_out,"<PR, %s>\n", pReservada[pos]);
+            TNext.cat = PR;
+            TNext.tipo.codigo = pos;
+            break;
         }
         case SN:
         {
-            fprintf(f_out,"<SN, %s>\n", pSinais[pos]);
-            token.cat = SN;
-            token.tipo.codigo = pos;
+//            fprintf(f_out,"<SN, %s>\n", pSinais[pos]);
+            TNext.cat = SN;
+            TNext.tipo.codigo = pos;
+            break;
         }
         case CT_I:
         {
             convert = atoi(lexema);
-            fprintf(f_out,"<CT_I, %d>\n", convert);
-            token.cat = CT_I;
-            token.tipo.valor_int = convert;
+//            fprintf(f_out,"<CT_I, %d>\n", convert);
+            TNext.cat = CT_I;
+            TNext.tipo.valor_int = convert;
+            break;
         }
         case CT_R:
         {
             convert2 = atof(lexema);
-            fprintf(f_out,"<CT_R, %.1f>\n", convert2);
-            token.cat = CT_R;
-            token.tipo.valor_real = convert2;
+//            fprintf(f_out,"<CT_R, %.1f>\n", convert2);
+            TNext.cat = CT_R;
+            TNext.tipo.valor_real = convert2;
+            break;
         }
         case CT_C:
         {
-            fprintf(f_out,"<CT_C,%s>\n", token);
-            token.cat = CT_C;
-            strcpy(token.tipo.lexema, lexema);        }
+//            fprintf(f_out,"<CT_C,%s>\n", lexema);
+            TNext.cat = CT_C;
+            strcpy(TNext.tipo.lexema, lexema);
+            break;
+        }
         case CT_CD:
         {
-            fprintf(f_out,"<CT_CD, %s>\n", token);
-            token.cat = CT_CD;
-            strcpy(token.tipo.lexema, lexema);        }
+//            fprintf(f_out,"<CT_CD, %s>\n", lexema);
+            TNext.cat = CT_CD;
+            strcpy(TNext.tipo.lexema, lexema);
+            break;
+        }
     }
 }
 
-int searchPR(char token[]) {
+int searchPR(char lexema[]) {
     int ativa;
     int i;
     ativa = 0;
     i = 1;
 
     while ((strcmp(pReservada[i], "") > 0)) {
-        if ((strcmp(token, pReservada[i]) == 0)) {
+        if ((strcmp(lexema, pReservada[i]) == 0)) {
             ativa = 1;
             break;
         }
@@ -147,9 +156,9 @@ int searchPR(char token[]) {
 
 void analexico() {
     int estado = 0;
-    char ch;
-    char tokenAux;
-    char token[TAM];
+    //char ch;
+    char TNextAux;
+    char lexema[TAM];
     int cont = 0;
     int pos = 0;
 
@@ -161,11 +170,11 @@ void analexico() {
         switch (estado) {
             case 0:
             {
-                memset(token, 0, TAM);
+                memset(lexema, 0, TAM);
                 cont = 0;
                 if(ch == '\''){
                     estado = 10;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 ch = getc(fp);
@@ -183,47 +192,47 @@ void analexico() {
                 }
                 if (isdigit(ch)) {
                     estado = 2;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (isalpha(ch)) {
                     estado = 1;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '\'') {
                     estado = 8;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '"') {
                     estado = 13;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '/') {
                     estado = 16;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '=') {
                     estado = 20;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '!') {
                     estado = 23;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '>') {
                     estado = 26;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 if (ch == '<') {
                     estado = 29;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
 
@@ -246,7 +255,7 @@ void analexico() {
                 ch = getc(fp);
                 if (isalpha(ch)||isdigit(ch)||ch =='_') {
                     estado = 1;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
                     estado = 3;
@@ -258,11 +267,11 @@ void analexico() {
                 ch = getc(fp);
                 if (isdigit(ch)) {
                     estado = 2;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else if(ch=='.'){
                     estado = 4;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 }
                 else {
@@ -272,11 +281,11 @@ void analexico() {
             }
             case 3:
             {
-                int lpr = searchPR(token);
+                int lpr = searchPR(lexema);
                 if(lpr){
-                    montaToken(PR, token, '\0', lpr);
+                    montaToken(PR, lexema, '\0', lpr);return;
                 }else{
-                    montaToken(ID, token, '\0', 0);
+                    montaToken(ID, lexema, '\0', 0);return;
                 }
 
                 estado = 0;
@@ -288,10 +297,10 @@ void analexico() {
                 ch = getc(fp);
                 if (isdigit(ch)) {
                     estado = 5;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
@@ -300,7 +309,7 @@ void analexico() {
                 ch = getc(fp);
                 if (isdigit(ch)) {
                     estado = 5;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
                     estado = 6;
@@ -309,14 +318,15 @@ void analexico() {
             }
             case 6:
             {
-                montaToken(CT_R, token, '\0', 0);
+                montaToken(CT_R, lexema, '\0', 0);return;
+                return;
                 estado = 0;
                 ungetc(ch, fp);
                 break;
             }
             case 7:
             {
-                montaToken(CT_I, token, '\0', 0);
+                montaToken(CT_I, lexema, '\0', 0);return;
                 estado = 0;
                 ungetc(ch, fp);
                 break;
@@ -326,13 +336,13 @@ void analexico() {
                 ch = getc(fp);
                 if (isprint(ch)) {
                     estado = 9;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else if(ch=='\\'){
                     estado = 11;
-                    tokenAux = ch;
+                    TNextAux = ch;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
@@ -341,20 +351,20 @@ void analexico() {
                 ch = getc(fp);
                 if(ch == '\''){
                     estado = 10;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else if (isprint(ch)) {
                     estado = 9;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
             case 10:
             {
-                montaToken(CT_C, token, tokenAux, 0);
+                montaToken(CT_C, lexema, TNextAux, 0);return;
                 estado = 0;
                 break;
             }
@@ -363,10 +373,10 @@ void analexico() {
                 ch = getc(fp);
                 if ((ch == 'n')||(ch == '0')) {
                     estado = 12;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
@@ -375,10 +385,10 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '\'') {
                     estado = 10;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
@@ -387,24 +397,24 @@ void analexico() {
                 ch = getc(fp);
                 if(ch == '"'){
                     estado = 15;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else if (isprint(ch)) {
                     estado = 13;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else if(ch == '"'){
                     estado = 15;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
             case 15:
             {
-                montaToken(CT_CD, token, '\0', pos);
+                montaToken(CT_CD, lexema, '\0', pos);return;
                 estado = 0;
                 break;
             }
@@ -413,17 +423,17 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '*') {
                     estado = 17;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else{
-                    error();
+                    error_lexico();
                 }
                 break;
             }
             case 17:
             {
                 ch = getc(fp);
-                token[cont] = ch;
+                lexema[cont] = ch;
                 cont++;
                 if (ch == '*') {
                     estado = 18;
@@ -437,7 +447,7 @@ void analexico() {
             case 18:
             {
                 ch = getc(fp);
-                token[cont] = ch;
+                lexema[cont] = ch;
                 cont++;
                 if (ch == '*') {
                     estado = 18;
@@ -461,7 +471,7 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '=') {
                     estado = 22;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
                     estado = 21;
@@ -470,13 +480,13 @@ void analexico() {
             }
             case 21:
             {
-                montaToken(SN, "=", '\0', IGUAL);
+                montaToken(SN, "=", '\0', IGUAL);return;
                 estado = 0;
                 break;
             }
             case 22:
             {
-                montaToken(SN, "==", '\0', ATRIBUICAO);
+                montaToken(SN, "==", '\0', ATRIBUICAO);return;
                 estado = 0;
                 break;
             }
@@ -485,7 +495,7 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '=') {
                     estado = 25;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
                     estado = 24;
@@ -494,13 +504,13 @@ void analexico() {
             }
             case 24:
             {
-                montaToken(SN, "!", '\0', NOT);
+                montaToken(SN, "!", '\0', NOT);return;
                 estado = 0;
                 break;
             }
             case 25:
             {
-                montaToken(SN, "!=", '\0', DIFERENTE);
+                montaToken(SN, "!=", '\0', DIFERENTE);return;
                 estado = 0;
                 break;
             }
@@ -509,7 +519,7 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '=') {
                     estado = 28;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
                     estado = 27;
@@ -518,14 +528,14 @@ void analexico() {
             }
             case 27:
             {
-                montaToken(SN, ">", '\0', MAIOR);
+                montaToken(SN, ">", '\0', MAIOR);return;
                 estado = 0;
                 ungetc(ch, fp);
                 break;
             }
             case 28:
             {
-                montaToken(SN, ">=", '\0', MAIORIGUAL);
+                montaToken(SN, ">=", '\0', MAIORIGUAL);return;
                 estado = 0;
                 ungetc(ch, fp);
                 break;
@@ -535,7 +545,7 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '=') {
                     estado = 31;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
                     estado = 30;
@@ -544,14 +554,14 @@ void analexico() {
             }
             case 30:
             {
-                montaToken(SN, "-", '\0', MENOR);
+                montaToken(SN, "-", '\0', MENOR);return;
                 estado = 0;
                 ungetc(ch, fp);
                 break;
             }
             case 31:
             {
-                montaToken(SN, "<=", '\0', MENORIGUAL);
+                montaToken(SN, "<=", '\0', MENORIGUAL);return;
                 estado = 0;
                 break;
             }
@@ -561,25 +571,25 @@ void analexico() {
                 str[0] =ch;
                 str[1] ='\0';
                 if(ch == '{'){
-                    montaToken(SN, str, '\0', ABRE_CHAVES);
+                    montaToken(SN, str, '\0', ABRE_CHAVES);return;
                 }else if(ch == '}'){
-                    montaToken(SN, str, '\0', FECHA_CHAVES);
+                    montaToken(SN, str, '\0', FECHA_CHAVES);return;
                 }else if(ch == '('){
-                    montaToken(SN, str, '\0', ABRE_PARENTESE);
+                    montaToken(SN, str, '\0', ABRE_PARENTESE);return;
                 }else if(ch == ')'){
-                     montaToken(SN, str, '\0', FECHA_PARENTESE);
+                     montaToken(SN, str, '\0', FECHA_PARENTESE);return;
                 }else if(ch == '+'){
-                    montaToken(SN, str, '\0', SOMA);
+                    montaToken(SN, str, '\0', SOMA);return;
                 }else if(ch == '-'){
-                    montaToken(SN, str, '\0', SUBTRACAO);
+                    montaToken(SN, str, '\0', SUBTRACAO);return;
                 }else if(ch == '*'){
-                    montaToken(SN, str, '\0', MULTIPLICACAO);
+                    montaToken(SN, str, '\0', MULTIPLICACAO);return;
                 }else if(ch == ','){
-                    montaToken(SN, str, '\0', VIRGULA);
+                    montaToken(SN, str, '\0', VIRGULA);return;
                 }else if(ch == ';'){
-                    montaToken(SN, str, '\0', PONTO_VIRGULA);
+                    montaToken(SN, str, '\0', PONTO_VIRGULA);return;
                 }else{
-                    error();
+                    error_lexico();
                 }
                 estado = 0;
                 break;
@@ -589,16 +599,16 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '&') {
                     estado = 34;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
             case 34:
             {
-                montaToken(SN, "&&", '\0', AND);
+                montaToken(SN, "&&", '\0', AND);return;
                 estado = 0;
                 break;
                             }
@@ -607,16 +617,16 @@ void analexico() {
                 ch = getc(fp);
                 if (ch == '!') {
                     estado = 36;
-                    token[cont] = ch;
+                    lexema[cont] = ch;
                     cont++;
                 } else {
-                    error();
+                    error_lexico();
                 }
                 break;
             }
             case 36:
             {
-                montaToken(SN, "||", '\0', OR);
+                montaToken(SN, "||", '\0', OR);return;
                 estado = 0;
                 break;            }
         }

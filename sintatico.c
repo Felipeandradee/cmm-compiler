@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sintatico.h"
-#include "lexico.h"
+
 
 //Lista de variaveis
-int contadorDeLinhas = 0; //proc_ = 0, func_ = 0;
+//int linha = 0; //proc_ = 0, func_ = 0;
 int enquanto_for_comando = 1;
 int veioExpressao = 0;
 int veioFator = 0;
@@ -18,207 +18,141 @@ int contagemParametros; //contagem dos parametros
 int eparam; //� Parametro (variavel que verifica se � um parametro)
 
 //Token como global
-TOKEN TNext; //No de Felipinho � lookAhead
+//TOKEN TNext; //No de Felipinho � lookAhead
 //Encerramento da lista de variaveis.
 
+//Revisar com Felipe
+void proximo_Token(){
+    analexico(); //Definir qual ser� o arquivo que o anelexo vai ler
+}
 
-void prog(){
-    Boolean eh_semretorno = FALSE;
 
-    if(TNext.cat == CT_CD && TNext.tipo.codigo == SEMRETORNO){
-        eh_semretorno = TRUE;
+//Revisar Modulos de erros posteriormente, s� para as fun��es n�o ficarem confusas
+void modulo_erros(Erro tipo_erro)
+{
+    printf("\nentrou no modulo_erros\n");
+    switch(tipo_erro)
+    {
+        case ID_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, ESPERADO IDENTIFICADOR!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ENDVAR_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, ENDVAR ESPERADO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case TIPO_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, TIPO ESPERADO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ABERTURA_PARENTESE_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, ABERTURA DE PARENTESE ESPERADO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case FECHAMENTO_PARENTESE_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, FECHAMENTO DE PARENTESE ESPERADO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case NOPARAM_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, TIPO OU NOPARAM ESPERADOS!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case EXPRESSAO_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, EXPRESSAO ESPERADA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case FATOR_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, FATOR ESPERADO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case TERMO_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, FATOR ESPERADO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case EXPR_SIMP_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, EXPR_SIMP INVALIDA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case EXPR_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, EXPR INVALIDA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case COMANDO_VAZIO_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, COMANDO VAZIO ERRO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case FECHAMENTO_COMANDO_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, NAO FECHOU O COMANDO ERRO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ATRIBUICAO_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, FALTOU SINAL IGUAL NA ATRIBUICAO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case VIRGULA_ERRO:
+            printf("\n\nERRO SINTATICO NA LINHA %d, FALTOU A VIRGULA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ASSINATURA_RETORNO_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DO RETORNO DA ASSINATURA DIFERENTE DO TIPO EM FUNC!\n\n",linha);
+            system("PAUSE");
+            break;
+
+        case QUANTIDADE_ARGUMENTOS_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, QUANTIDADE DE ARGUMENTOS EM FUNC OU PROC DIFERENTE DA ASSINATURA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ARGUMENTO_INVALIDO_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DE ARGUMENTO DIFERENTE DA ASSINATURA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ID_NAO_ENCONTRADO_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, NAO POSSUI ASSINATURA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case VAR_NAO_DECLARADA_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, VARIAVEL NAO FOI DECLARADA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case TIPO_INCOMPATIVEL_ERRO:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPOS INCOMPATIVEIS!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case RETURN_PROC_ERRO:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, RETURN EM PROC NAO PODE TER (EXPR)!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case RETURN_FUNC_ERRO:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, FUNC NAO PODE TER RETURN PURO!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case RETURN_EXPR_ERRO:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO EM RETURN DIFERENTE DO TIPO EM FUNC!\n\n", linha);
+            system("PAUSE");
+            break;
     }
-
-    if (TNext.cat == CT_CD && TNext.tipo.codigo == PROTOTIPO){
-
-        proximo_Token();
-
-        if(TNext.cat == CT_CD && TNext.tipo.codigo == SEMRETORNO){
-            eh_semretorno = TRUE;
-        }
-
-        if(tipo() || eh_semretorno){
-            proximo_Token();
-
-            if(TNext.cat == ID){
-//            strcpy(nome_func, TNext.tipo.lexema);
-//
-//            //colocar as fun��es da tabela de simbolos depois
-//            pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 0);                     //MODIFICA��O
-//            adicionar_Tabela_Simbolos(TNext.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
-
-                proximo_Token();
-
-                if(TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE){
-                    proximo_Token();
-
-                    tipos_p_opc();
-
-                    proximo_Token();
-
-                    if(TNext.cat == SN && TNext.tipo.codigo == FECHA_PARENTESE){
-                        proximo_Token();
-
-                            while((TNext.cat == SN && TNext.tipo.codigo == VIRGULA)){
-
-                                proximo_Token();
-
-                                if(TNext.cat == ID){
-                                    proximo_Token();
-
-                                    if((TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE)) {
-                                        proximo_Token();
-
-                                        tipos_p_opc();
-
-                                        proximo_Token();
-
-                                        if(!(TNext.cat == SN && TNext.tipo.codigo == FECHA_PARENTESE)){
-                                            modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
-                                        }
-
-                                    } else {
-                                        modulo_erros((Erro)ABERTURA_PARENTESE_ERRO);
-                                    }
-
-//                                                pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 1);                     //MODIFICA��O
-//                                                adicionar_Tabela_Simbolos(TNext.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
-                                    eparam=0;
-                                    proximo_Token();
-                                }
-                                else{
-                                    modulo_erros((Erro)ID_ERRO);
-                                }
-
-                            }
-//                                    TODO: criar erro pra ponto e virgula
-                            if(!(TNext.cat == SN && TNext.tipo.codigo == PONTO_VIRGULA)){
-                                modulo_erros((Erro)VIRGULA_ERRO);
-                            }
-                        }
-                        else
-                                {
-                                    modulo_erros((Erro)ID_ERRO);
-                                }
-                            }
-
-
-                    }
-                    else
-                    {
-                        modulo_erros((Erro)ID_ERRO);
-                    }
-                }
-                else{
-                    modulo_erros((Erro)TIPO_ERRO);
-                }
-            }
-
-
-    else if(tipo() || eh_semretorno){
-        proximo_Token();
-
-        if(TNext.cat == ID){
-//            strcpy(nome_func, TNext.tipo.lexema);
-//
-//            //colocar as fun��es da tabela de simbolos depois
-//            pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 0);                     //MODIFICA��O
-//            adicionar_Tabela_Simbolos(TNext.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
-
-            proximo_Token();
-
-            if((TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE)){
-                proximo_Token();
-
-                tipos_param();
-
-                if(TNext.cat == SN && TNext.tipo.codigo == FECHA_PARENTESE){
-                    proximo_Token();
-
-                    if(TNext.cat == SN && TNext.tipo.codigo == ABRE_CHAVES){
-                        proximo_Token();
-
-                        while(tipo()){
-
-                            proximo_Token();
-
-                                if(TNext.cat == ID){
-//                                    pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 1);                     //MODIFICA��O
-//                                    adicionar_Tabela_Simbolos(TNext.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O //verificar se o nome � var mesmo
-                                    eparam=0;
-
-                                    proximo_Token();
-
-                                    while((TNext.cat == SN && TNext.tipo.codigo == VIRGULA)){
-
-                                            proximo_Token();
-
-                                            if(TNext.cat == ID){
-//                                                pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 1);                     //MODIFICA��O
-//                                                adicionar_Tabela_Simbolos(TNext.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
-                                                eparam=0;
-                                                proximo_Token();
-                                            }
-                                            else{
-                                                modulo_erros((Erro)ID_ERRO);
-                                            }
-
-                                    }
-//                                    TODO: criar erro pra ponto e virgula
-                                    if(!(TNext.cat == SN && TNext.tipo.codigo == PONTO_VIRGULA)){
-                                        modulo_erros((Erro)VIRGULA_ERRO);
-                                    }
-                                }
-                                else
-                                {
-                                    modulo_erros((Erro)ID_ERRO);
-                                }
-                        }
-
-                        cmd();
-
-//                        TODO: criar erro de Abre chaves e fecha chaves
-                        if(!(TNext.cat == SN && TNext.tipo.codigo == FECHA_CHAVES)){
-                            modulo_erros((Erro) ABRE_CHAVES);
-                        }
-
-                    } else {
-//                        TODO: criar erro de Abre chaves e fecha chaves
-                        modulo_erros((Erro) ABRE_CHAVES);
-                    }
-
-                }
-                else
-                {
-                    modulo_erros((Erro)FECHAMENTO_PARENTESE_ERRO);
-                }
-            } else if(eh_semretorno){
-                modulo_erros((Erro)ABERTURA_PARENTESE_ERRO);
-            }
-            else if (TNext.tipo.codigo == VIRGULA)
-            {
-                while(TNext.tipo.codigo == VIRGULA){
-                    proximo_Token();
-                    if(TNext.cat != ID){
-                        modulo_erros((Erro)ID_ERRO);
-                    }
-                    proximo_Token();
-                }
-
-            } else if (TNext.tipo.codigo == PONTO_VIRGULA){}
-            else{
-                modulo_erros((Erro)VIRGULA_ERRO);
-            }
-        }
-        else
-        {
-            modulo_erros((Erro)ID_ERRO);
-        }
-    }
-
-
-    excluir_Tabela_Simbolos();
-
 }
 
 
@@ -243,6 +177,24 @@ Boolean tipo(){
     }
 
     return FALSE;
+}
+
+//atrib, ok!
+void atrib(){
+    if(TNext.cat == ID){
+        proximo_Token();
+
+        if(TNext.cat == SN && TNext.tipo.codigo == IGUAL){
+            proximo_Token();
+            expr();
+
+            if(veioExpressao == 0)
+                modulo_erros((Erro)EXPR_ERRO);
+
+            veioAtribuicao = 1;
+
+        } else modulo_erros((Erro)ATRIBUICAO_ERRO);
+    }
 }
 
 //colocar as fun��es (ou fazer) da tabela de simbolos
@@ -521,33 +473,16 @@ char id_[15];
     }
 }
 
-//atrib, ok!
-void atrib(){
-    if(TNext.cat == ID){
-        proximo_Token();
-
-        if(TNext.cat == SN && TNext.tipo.codigo == IGUAL){
+//termo, ok!
+Boolean termo(){
+    if(fator()){
+        while((TNext.cat == SN && TNext.tipo.codigo == MULTIPLICACAO) || (TNext.cat == SN && TNext.tipo.codigo == DIVISAO) || (TNext.cat == SN && TNext.tipo.codigo == AND)){
             proximo_Token();
-            expr();
 
-            if(veioExpressao == 0)
-                modulo_erros((Erro)EXPR_ERRO);
-
-            veioAtribuicao = 1;
-
-        } else modulo_erros((Erro)ATRIBUICAO_ERRO);
-    }
-}
-
-//expr, ok!
-Boolean expr(){
-    if(expr_simp()){
-        proximo_Token();
-
-        if(op_rel()){
-            proximo_Token();
-            if(!expr_simp())
-                modulo_erros((Erro)EXPR_SIMP_ERRO);
+            if(fator())
+                proximo_Token();
+            else
+                modulo_erros((Erro)FATOR_ERRO);
         }
         return TRUE;
     }
@@ -573,21 +508,22 @@ Boolean expr_simp(){
     return FALSE;
 }
 
-//termo, ok!
-Boolean termo(){
-    if(fator()){
-        while((TNext.cat == SN && TNext.tipo.codigo == MULTIPLICACAO) || (TNext.cat == SN && TNext.tipo.codigo == DIVISAO) || (TNext.cat == SN && TNext.tipo.codigo == AND)){
-            proximo_Token();
 
-            if(fator())
-                proximo_Token();
-            else
-                modulo_erros((Erro)FATOR_ERRO);
+//expr, ok!
+Boolean expr(){
+    if(expr_simp()){
+        proximo_Token();
+
+        if(op_rel()){
+            proximo_Token();
+            if(!expr_simp())
+                modulo_erros((Erro)EXPR_SIMP_ERRO);
         }
         return TRUE;
     }
     return FALSE;
 }
+
 
 //Talvez revisar com Felipe, mas por enquanto t� ok
 Boolean fator(){
@@ -669,10 +605,10 @@ Boolean fator(){
     if(TNext.cat == SN && TNext.tipo.codigo == NOT){
         veioExpressao = 1;
         proximo_Token();
-            if(fator())
-                proximo_Token();
-            else
-                modulo_erros((Erro)FATOR_ERRO);
+        if(fator())
+            proximo_Token();
+        else
+            modulo_erros((Erro)FATOR_ERRO);
 
         return TRUE;
     }
@@ -752,137 +688,6 @@ Boolean op_rel(){
 /* A partir daqui s�o as fun��es auxiliares para fazer
 O compilador funcionar por completo. */
 
-//Revisar com Felipe
-void proximo_Token(){
-   analexico(); //Definir qual ser� o arquivo que o anelexo vai ler
-}
-
-//Revisar Modulos de erros posteriormente, s� para as fun��es n�o ficarem confusas
-void modulo_erros(Erro tipo_erro)
-{
-         switch(tipo_erro)
-         {
-             case ID_ERRO:
-                 printf("\n\nERRO SINTATICO NA LINHA %d, ESPERADO IDENTIFICADOR!\n\n", contadorDeLinhas);
-                 system("PAUSE");
-             break;
-
-             case ENDVAR_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, ENDVAR ESPERADO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case TIPO_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, TIPO ESPERADO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case ABERTURA_PARENTESE_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, ABERTURA DE PARENTESE ESPERADO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case FECHAMENTO_PARENTESE_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, FECHAMENTO DE PARENTESE ESPERADO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case NOPARAM_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, TIPO OU NOPARAM ESPERADOS!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case EXPRESSAO_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, EXPRESSAO ESPERADA!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case FATOR_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, FATOR ESPERADO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case TERMO_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, FATOR ESPERADO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case EXPR_SIMP_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, EXPR_SIMP INVALIDA!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case EXPR_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, EXPR INVALIDA!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case COMANDO_VAZIO_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, COMANDO VAZIO ERRO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case FECHAMENTO_COMANDO_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, NAO FECHOU O COMANDO ERRO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case ATRIBUICAO_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, FALTOU SINAL IGUAL NA ATRIBUICAO!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case VIRGULA_ERRO:
-                printf("\n\nERRO SINTATICO NA LINHA %d, FALTOU A VIRGULA!\n\n", contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case ASSINATURA_RETORNO_ERROR:
-                printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DO RETORNO DA ASSINATURA DIFERENTE DO TIPO EM FUNC!\n\n",contadorDeLinhas);
-                system("PAUSE");
-             break;
-
-             case QUANTIDADE_ARGUMENTOS_ERROR:
-                 printf("\n\nERRO SEMANTICO NA LINHA %d, QUANTIDADE DE ARGUMENTOS EM FUNC OU PROC DIFERENTE DA ASSINATURA!\n\n", contadorDeLinhas);
-                 system("PAUSE");
-             break;
-
-             case ARGUMENTO_INVALIDO_ERROR:
-                 printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DE ARGUMENTO DIFERENTE DA ASSINATURA!\n\n", contadorDeLinhas);
-                 system("PAUSE");
-             break;
-
-             case ID_NAO_ENCONTRADO_ERROR:
-                 printf("\n\nERRO SEMANTICO NA LINHA %d, NAO POSSUI ASSINATURA!\n\n", contadorDeLinhas);
-                 system("PAUSE");
-             break;
-
-             case VAR_NAO_DECLARADA_ERROR:
-                  printf("\n\nERRO SEMANTICO NA LINHA %d, VARIAVEL NAO FOI DECLARADA!\n\n", contadorDeLinhas);
-                  system("PAUSE");
-             break;
-
-             case TIPO_INCOMPATIVEL_ERRO:
-                  printf("\n\nERRO SEMANTICO NA LINHA %d, TIPOS INCOMPATIVEIS!\n\n", contadorDeLinhas);
-                  system("PAUSE");
-             break;
-
-             case RETURN_PROC_ERRO:
-                  printf("\n\nERRO SEMANTICO NA LINHA %d, RETURN EM PROC NAO PODE TER (EXPR)!\n\n", contadorDeLinhas);
-                  system("PAUSE");
-             break;
-
-             case RETURN_FUNC_ERRO:
-                  printf("\n\nERRO SEMANTICO NA LINHA %d, FUNC NAO PODE TER RETURN PURO!\n\n", contadorDeLinhas);
-                  system("PAUSE");
-             break;
-
-             case RETURN_EXPR_ERRO:
-                  printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO EM RETURN DIFERENTE DO TIPO EM FUNC!\n\n", contadorDeLinhas);
-                  system("PAUSE");
-             break;
-         }
-}
 
 // TODO: Codigos da tabela de simbolos.
 void adicionar_Tabela_Simbolos(char id_[], int escopo_, char tipo_[], char cat_[])
@@ -959,3 +764,208 @@ void listar_Tabela_Simbolos()
 //     	puts(tabela_Simbolos[x].id);
 //	 }
 }
+
+
+void prog(){
+    proximo_Token();
+    printf("\nentrou no prog\n");
+    Boolean eh_semretorno = FALSE;
+
+    if(TNext.cat == CT_CD && TNext.tipo.codigo == SEMRETORNO){
+        eh_semretorno = TRUE;
+    }
+
+    if (TNext.cat == CT_CD && TNext.tipo.codigo == PROTOTIPO){
+
+        proximo_Token();
+
+        if(TNext.cat == CT_CD && TNext.tipo.codigo == SEMRETORNO){
+            eh_semretorno = TRUE;
+        }
+
+        if(tipo() || eh_semretorno){
+            proximo_Token();
+
+            if(TNext.cat == ID){
+//            strcpy(nome_func, TNext.tipo.lexema);
+//
+//            //colocar as fun��es da tabela de simbolos depois
+//            pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 0);                     //MODIFICA��O
+//            adicionar_Tabela_Simbolos(TNext.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
+
+                proximo_Token();
+
+                if(TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE){
+                    proximo_Token();
+
+                    tipos_p_opc();
+
+                    proximo_Token();
+
+                    if(TNext.cat == SN && TNext.tipo.codigo == FECHA_PARENTESE){
+                        proximo_Token();
+
+                        while((TNext.cat == SN && TNext.tipo.codigo == VIRGULA)){
+
+                            proximo_Token();
+
+                            if(TNext.cat == ID){
+                                proximo_Token();
+
+                                if((TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE)) {
+                                    proximo_Token();
+
+                                    tipos_p_opc();
+
+                                    proximo_Token();
+
+                                    if(!(TNext.cat == SN && TNext.tipo.codigo == FECHA_PARENTESE)){
+                                        modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
+                                    }
+
+                                } else {
+                                    modulo_erros((Erro)ABERTURA_PARENTESE_ERRO);
+                                }
+
+//                                                pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 1);                     //MODIFICA��O
+//                                                adicionar_Tabela_Simbolos(TNext.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
+                                eparam=0;
+                                proximo_Token();
+                            }
+                            else{
+                                modulo_erros((Erro)ID_ERRO);
+                            }
+
+                        }
+//                                    TODO: criar erro pra ponto e virgula
+                        if(!(TNext.cat == SN && TNext.tipo.codigo == PONTO_VIRGULA)){
+                            modulo_erros((Erro)VIRGULA_ERRO);
+                        }
+                    }
+                    else
+                    {
+                        modulo_erros((Erro)ID_ERRO);
+                    }
+                }
+
+
+            }
+            else
+            {
+                modulo_erros((Erro)ID_ERRO);
+            }
+        }
+        else{
+            modulo_erros((Erro)TIPO_ERRO);
+        }
+    }
+
+
+    else if(tipo() || eh_semretorno){
+        proximo_Token();
+
+        if(TNext.cat == ID){
+//            strcpy(nome_func, TNext.tipo.lexema);
+//
+//            //colocar as fun��es da tabela de simbolos depois
+//            pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 0);                     //MODIFICA��O
+//            adicionar_Tabela_Simbolos(TNext.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
+
+            proximo_Token();
+
+            if((TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE)){
+                proximo_Token();
+
+                tipos_param();
+
+                if(TNext.cat == SN && TNext.tipo.codigo == FECHA_PARENTESE){
+                    proximo_Token();
+
+                    if(TNext.cat == SN && TNext.tipo.codigo == ABRE_CHAVES){
+                        proximo_Token();
+
+                        while(tipo()){
+
+                            proximo_Token();
+
+                            if(TNext.cat == ID){
+//                                    pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 1);                     //MODIFICA��O
+//                                    adicionar_Tabela_Simbolos(TNext.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O //verificar se o nome � var mesmo
+                                eparam=0;
+
+                                proximo_Token();
+
+                                while((TNext.cat == SN && TNext.tipo.codigo == VIRGULA)){
+
+                                    proximo_Token();
+
+                                    if(TNext.cat == ID){
+//                                                pesquisar_Tabela_Simbolos(TNext.tipo.lexema, 1);                     //MODIFICA��O
+//                                                adicionar_Tabela_Simbolos(TNext.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
+                                        eparam=0;
+                                        proximo_Token();
+                                    }
+                                    else{
+                                        modulo_erros((Erro)ID_ERRO);
+                                    }
+
+                                }
+//                                    TODO: criar erro pra ponto e virgula
+                                if(!(TNext.cat == SN && TNext.tipo.codigo == PONTO_VIRGULA)){
+                                    modulo_erros((Erro)VIRGULA_ERRO);
+                                }
+                            }
+                            else
+                            {
+                                modulo_erros((Erro)ID_ERRO);
+                            }
+                        }
+
+                        cmd();
+
+//                        TODO: criar erro de Abre chaves e fecha chaves
+                        if(!(TNext.cat == SN && TNext.tipo.codigo == FECHA_CHAVES)){
+                            modulo_erros((Erro) ABRE_CHAVES);
+                        }
+
+                    } else {
+//                        TODO: criar erro de Abre chaves e fecha chaves
+                        modulo_erros((Erro) ABRE_CHAVES);
+                    }
+
+                }
+                else
+                {
+                    modulo_erros((Erro)FECHAMENTO_PARENTESE_ERRO);
+                }
+            } else if(eh_semretorno){
+                modulo_erros((Erro)ABERTURA_PARENTESE_ERRO);
+            }
+            else if (TNext.tipo.codigo == VIRGULA)
+            {
+                while(TNext.tipo.codigo == VIRGULA){
+                    proximo_Token();
+                    if(TNext.cat != ID){
+                        modulo_erros((Erro)ID_ERRO);
+                    }
+                    proximo_Token();
+                }
+
+            } else if (TNext.tipo.codigo == PONTO_VIRGULA){}
+            else{
+                modulo_erros((Erro)VIRGULA_ERRO);
+            }
+        }
+        else
+        {
+            modulo_erros((Erro)ID_ERRO);
+        }
+    }
+
+    printf("\nsaindo do prog\n");
+    excluir_Tabela_Simbolos();
+
+
+}
+
+
