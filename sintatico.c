@@ -25,7 +25,7 @@ int eparam; //� Parametro (variavel que verifica se � um parametro)
 //TODO: Ver como vai ficar em questao do ultimo token
 void proximo_Token(){
     Token = TNext;
-    if(Token.cat != END)
+//    if(Token.cat != END)
         analexico();
 
 }
@@ -203,9 +203,8 @@ void atrib(){
 
         if(Token.cat == SN && Token.tipo.codigo == ATRIBUICAO){
             proximo_Token();
-            expr();
 
-            if(veioExpressao == 0)
+            if(!expr())
                 modulo_erros((Erro)EXPR_ERRO);
 
             veioAtribuicao = 1;
@@ -333,15 +332,13 @@ void cmd(){
 
         if(Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE){
             proximo_Token();
-            expr();
 
-            if(veioExpressao){
+            if(expr()){
                 while(enquanto_for_virgula){
                     if(Token.cat == SN && Token.tipo.codigo == VIRGULA){
                         proximo_Token();
-                        expr();
 
-                        if(veioExpressao){
+                        if(expr()){
                             enquanto_for_virgula = TRUE;
                             proximo_Token();
                         }
@@ -783,7 +780,7 @@ void listar_Tabela_Simbolos()
 
 
 void prog() {
-    while (1){
+    while (Token.cat != END){
 
 
     proximo_Token();

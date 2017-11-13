@@ -46,7 +46,7 @@ char pSinais[100][18] = {
 
 
 void error_lexico() {
-    fprintf(f_out,"Erro lexico na linha %d\n", linha);
+    printf("Erro lexico na linha %d\n", linha);
     exit(1);
 }
 
