@@ -17,7 +17,7 @@ CT_C = caracter
 CT_CD = cadeia de caracter
 */
 typedef enum {
-    ID, PR, SN, CT_I, CT_R, CT_C, CT_CD
+    ID, PR, SN, CT_I, CT_R, CT_C, CT_CD, END
 } categoria;
 
 typedef enum {

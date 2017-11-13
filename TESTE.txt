@@ -1,0 +1,37 @@
+inteiro A;
+inteiro B;
+caracter FRASE;
+caracter ALFA;
+real FLOAT;
+booleano TRIGGER;
+
+A = 8;
+B = 5;
+FRASE = "Essa e uma frase";
+ALFA = 'X';
+FLOAT = 45.755;
+TRIGGER = 1;
+
+inteiro SOMA(inteiro A){
+se (A >= B)
+	retorne A-B;
+senao
+	retorne A+B;
+}
+
+semretorno INCREMENTA 			(semparam)	{
+	inteiro X;
+	para(X = 1;X <= SOMA;X=X+1)
+		FLOAT = FLOAT + X;
+}
+
+booleano CALCULO (inteiro A, inteiro B){
+	inteiro X;
+	X = 1;
+	enquanto(X < A)
+		X = X + 1;
+	se	(X - B == 0)
+		retorne 1;
+	senao
+		retorne 0;
+}

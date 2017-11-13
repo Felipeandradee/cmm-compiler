@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sintatico.h"
-#include "lexico.h"
+
 
 
 //Lista de variaveis
@@ -25,7 +25,8 @@ int eparam; //� Parametro (variavel que verifica se � um parametro)
 //TODO: Ver como vai ficar em questao do ultimo token
 void proximo_Token(){
     Token = TNext;
-    analexico();
+    if(Token.cat != END)
+        analexico();
 
 }
 
@@ -781,26 +782,29 @@ void listar_Tabela_Simbolos()
 }
 
 
-void prog(){
+void prog() {
+    while (1){
+
+
     proximo_Token();
     Boolean eh_semretorno = FALSE;
 
-    if(Token.cat == CT_CD && Token.tipo.codigo == SEMRETORNO){
+    if (Token.cat == CT_CD && Token.tipo.codigo == SEMRETORNO) {
         eh_semretorno = TRUE;
     }
 
-    if (Token.cat == CT_CD && Token.tipo.codigo == PROTOTIPO){
+    if (Token.cat == CT_CD && Token.tipo.codigo == PROTOTIPO) {
 
         proximo_Token();
 
-        if(Token.cat == CT_CD && Token.tipo.codigo == SEMRETORNO){
+        if (Token.cat == CT_CD && Token.tipo.codigo == SEMRETORNO) {
             eh_semretorno = TRUE;
         }
 
-        if(tipo() || eh_semretorno){
+        if (tipo() || eh_semretorno) {
             proximo_Token();
 
-            if(Token.cat == ID){
+            if (Token.cat == ID) {
 //            strcpy(nome_func, Token.tipo.lexema);
 //
 //            //colocar as fun��es da tabela de simbolos depois
@@ -809,74 +813,67 @@ void prog(){
 
                 proximo_Token();
 
-                if(Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE){
+                if (Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE) {
                     proximo_Token();
 
                     tipos_p_opc();
 
                     proximo_Token();
 
-                    if(Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE){
+                    if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE) {
                         proximo_Token();
 
-                        while((Token.cat == SN && Token.tipo.codigo == VIRGULA)){
+                        while ((Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
 
                             proximo_Token();
 
-                            if(Token.cat == ID){
+                            if (Token.cat == ID) {
                                 proximo_Token();
 
-                                if((Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE)) {
+                                if ((Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE)) {
                                     proximo_Token();
 
                                     tipos_p_opc();
 
                                     proximo_Token();
 
-                                    if(!(Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE)){
+                                    if (!(Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE)) {
                                         modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                                     }
 
                                 } else {
-                                    modulo_erros((Erro)ABERTURA_PARENTESE_ERRO);
+                                    modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
                                 }
 
 //                                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
 //                                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
-                                eparam=0;
+                                eparam = 0;
                                 proximo_Token();
-                            }
-                            else{
-                                modulo_erros((Erro)ID_ERRO);
+                            } else {
+                                modulo_erros((Erro) ID_ERRO);
                             }
 
                         }
 
-                        if(!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)){
-                            modulo_erros((Erro)PONTO_VIRGULA_ERRO);
+                        if (!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)) {
+                            modulo_erros((Erro) PONTO_VIRGULA_ERRO);
                         }
-                    }
-                    else
-                    {
-                        modulo_erros((Erro)ID_ERRO);
+                    } else {
+                        modulo_erros((Erro) ID_ERRO);
                     }
                 }
 
 
+            } else {
+                modulo_erros((Erro) ID_ERRO);
             }
-            else
-            {
-                modulo_erros((Erro)ID_ERRO);
-            }
+        } else {
+            modulo_erros((Erro) TIPO_ERRO);
         }
-        else{
-            modulo_erros((Erro)TIPO_ERRO);
-        }
-    }
-    else if(tipo() || eh_semretorno){
+    } else if (tipo() || eh_semretorno) {
         proximo_Token();
 
-        if(Token.cat == ID){
+        if (Token.cat == ID) {
 //            strcpy(nome_func, Token.tipo.lexema);
 //
 //            //colocar as fun��es da tabela de simbolos depois
@@ -885,61 +882,58 @@ void prog(){
 
             proximo_Token();
 
-            if((Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE)){
+            if ((Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE)) {
                 proximo_Token();
 
                 tipos_param();
 
-                if(Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE){
+                if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE) {
                     proximo_Token();
 
-                    if(Token.cat == SN && Token.tipo.codigo == ABRE_CHAVES){
+                    if (Token.cat == SN && Token.tipo.codigo == ABRE_CHAVES) {
                         proximo_Token();
 
-                        while(tipo()){
+                        while (tipo()) {
 
                             proximo_Token();
 
-                            if(Token.cat == ID){
+                            if (Token.cat == ID) {
 //                                    pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
 //                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O //verificar se o nome � var mesmo
-                                eparam=0;
+                                eparam = 0;
 
                                 proximo_Token();
 
-                                while((Token.cat == SN && Token.tipo.codigo == VIRGULA)){
+                                while ((Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
 
                                     proximo_Token();
 
-                                    if(Token.cat == ID){
+                                    if (Token.cat == ID) {
 //                                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
 //                                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
-                                        eparam=0;
+                                        eparam = 0;
                                         proximo_Token();
-                                    }
-                                    else{
-                                        modulo_erros((Erro)ID_ERRO);
+                                    } else {
+                                        modulo_erros((Erro) ID_ERRO);
                                     }
 
                                 }
 
-                                if(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)
+                                if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)
                                     proximo_Token();
                                 else
-                                    modulo_erros((Erro)PONTO_VIRGULA_ERRO);
-                            }
-                            else
-                            {
-                                modulo_erros((Erro)ID_ERRO);
+                                    modulo_erros((Erro) PONTO_VIRGULA_ERRO);
+                            } else {
+                                modulo_erros((Erro) ID_ERRO);
                             }
                         }
 
                         enquanto_for_comando = 1;
-                        while(enquanto_for_comando){
+                        while (enquanto_for_comando) {
                             cmd();
                         }
 
-                        if(!(Token.cat == SN && Token.tipo.codigo == FECHA_CHAVES)){
+                        if (!(Token.cat == SN && Token.tipo.codigo == FECHA_CHAVES)) {
                             modulo_erros((Erro) FECHAMENTO_CHAVES_ERRO);
                         }
 
@@ -947,38 +941,32 @@ void prog(){
                         modulo_erros((Erro) ABERTURA_CHAVES_ERRO);
                     }
 
+                } else {
+                    modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                 }
-                else
-                {
-                    modulo_erros((Erro)FECHAMENTO_PARENTESE_ERRO);
-                }
-            } else if(eh_semretorno){
-                modulo_erros((Erro)ABERTURA_PARENTESE_ERRO);
-            }
-            else if (Token.tipo.codigo == VIRGULA)
-            {
-                while(Token.tipo.codigo == VIRGULA){
+            } else if (eh_semretorno) {
+                modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
+            } else if (Token.tipo.codigo == VIRGULA) {
+                while (Token.tipo.codigo == VIRGULA) {
                     proximo_Token();
-                    if(Token.cat != ID){
-                        modulo_erros((Erro)ID_ERRO);
+                    if (Token.cat != ID) {
+                        modulo_erros((Erro) ID_ERRO);
                     }
                     proximo_Token();
                 }
 
-            } else if (Token.tipo.codigo == PONTO_VIRGULA){}
-            else{
-                modulo_erros((Erro)PONTO_VIRGULA_ERRO);
+            } else if (Token.tipo.codigo == PONTO_VIRGULA) {}
+            else {
+                modulo_erros((Erro) PONTO_VIRGULA_ERRO);
             }
-        }
-        else
-        {
-            modulo_erros((Erro)ID_ERRO);
+        } else {
+            modulo_erros((Erro) ID_ERRO);
         }
     }
 
     excluir_Tabela_Simbolos();
 
-
+}
 }
 
 

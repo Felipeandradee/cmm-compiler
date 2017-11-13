@@ -18,8 +18,8 @@ int main() {
 //    analexico();
 //	f_out = salvarArquivo(nome_arquivo_out);
 	analexico();
-    while(1){
+//    while(1){
         prog();
-    }
+//    }
 
 }

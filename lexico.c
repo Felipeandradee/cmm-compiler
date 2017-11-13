@@ -157,12 +157,12 @@ int searchPR(char lexema[]) {
 void analexico() {
     int estado = 0;
     //char ch;
-    char TNextAux;
+    char TokenAux;
     char lexema[TAM];
     int cont = 0;
     int pos = 0;
 
-    while (ch != EOF) {
+    while (1) {
 //        if ((ch == '\n'))
 //            printf("LINHA %d\n", linha);
 
@@ -180,6 +180,7 @@ void analexico() {
                 ch = getc(fp);
                 if(ch == EOF) {
                     printf("FIM DO ARQUIVO\n");
+                    TNext.cat = END;
                     return ;
                 }
 
@@ -336,7 +337,7 @@ void analexico() {
                     cont++;
                 } else if(ch=='\\'){
                     estado = 11;
-                    TNextAux = ch;
+                    TokenAux = ch;
                 } else {
                     error_lexico();
                 }
@@ -360,7 +361,7 @@ void analexico() {
             }
             case 10:
             {
-                montaToken(CT_C, lexema, TNextAux, 0);
+                montaToken(CT_C, lexema, TokenAux, 0);
                 return;
             }
             case 11:
