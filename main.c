@@ -17,13 +17,9 @@ int main() {
 	fp = abrirArquivo(nome_arquivo_in);
 //    analexico();
 //	f_out = salvarArquivo(nome_arquivo_out);
-//	analexico();
-    prog();
-    fclose(fp);
-//    fclose(f_out);
-    printf("ENDPROGRAM\n");
-//    printf("\nToken salvos em %s\n", nome_arquivo_out);
-    system("PAUSE");
+	analexico();
+    while(1){
+        prog();
+    }
 
-    return 0;
 }
