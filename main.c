@@ -4,8 +4,8 @@
 
 int main() {
 
-    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd1.txt";
-//    char nome_arquivo_out[100] = "SAIDA.txt";
+//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd1.txt";
+    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\TESTE.txt";
 
 //    printf("digite o nome do arquivo para a analise l�xica:\n");
 //    scanf("%s", nome_arquivo_in);
@@ -15,11 +15,9 @@ int main() {
 
     printf("\nAnalisando o arquivo %s\n", nome_arquivo_in);
 	fp = abrirArquivo(nome_arquivo_in);
-//    analexico();
 //	f_out = salvarArquivo(nome_arquivo_out);
+
 	analexico();
-//    while(1){
-        prog();
-//    }
+    prog();
 
 }

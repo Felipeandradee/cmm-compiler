@@ -5,14 +5,14 @@
 
 
 
-//Lista de variaveis
+//TODO: revisar Lista de variaveis
 //int linha = 0; //proc_ = 0, func_ = 0;
 int enquanto_for_comando = 1;
 int veioExpressao = 0;
 int veioFator = 0;
 int veioAtribuicao = 0;
-int posicaoFixa = 0;
-int posicaoAtual = 0;
+int posicao_fixa = 0;
+int posicao_atual = 0;
 int tipoRelacional; //Define qual � o operacional utilizado, facilita para fazer compara��es posteriormente
 int posicaoParametros; //posi��o dos parametros
 int contagemParametros; //contagem dos parametros
@@ -25,13 +25,12 @@ int eparam; //� Parametro (variavel que verifica se � um parametro)
 //TODO: Ver como vai ficar em questao do ultimo token
 void proximo_Token(){
     Token = TNext;
-//    if(Token.cat != END)
+    if(Token.cat != END)
         analexico();
 
 }
 
-
-//Revisar Modulos de erros posteriormente, s� para as fun��es n�o ficarem confusas
+//TODO: revisar o modulo_erros
 void modulo_erros(Erro tipo_erro)
 {
     switch(tipo_erro)
@@ -213,8 +212,6 @@ void atrib(){
     }
 }
 
-//colocar as fun��es (ou fazer) da tabela de simbolos
-//Revisar com Felipe depois. Mas por enquanto ta ok.
 void tipos_param(){
 Boolean  enquanto_for_virgula = TRUE;
 
@@ -226,10 +223,9 @@ Boolean  enquanto_for_virgula = TRUE;
             proximo_Token();
 
             if(Token.cat == ID){
-                //pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
-//                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "param");     //MODIFICA��O //revisar se esse param existe na linguagem cmm
+                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
+                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "param");     //MODIFICA��O //revisar se esse param existe na linguagem cmm
 
-                //adicionar_deslocamento(lookAhead.palavra, deslocamento_cont_param, e_param);
                 /* tirar duvidas com Felipe em rela��o ao o que � esses deslocamentos .-. */
 
                 proximo_Token();
@@ -243,8 +239,8 @@ Boolean  enquanto_for_virgula = TRUE;
                             proximo_Token();
 
                             if(Token.cat == ID){
-//                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
-//                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "param");     //MODIFICA��O
+                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
+                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "param");     //MODIFICA��O
 
                                 proximo_Token();
                                 enquanto_for_virgula = TRUE;
@@ -280,11 +276,8 @@ void tipos_p_opc(){
             if(Token.cat == ID) {
                 proximo_Token();
             }
-                //pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
-//                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "param");     //MODIFICA��O //revisar se esse param existe na linguagem cmm
-
-                //adicionar_deslocamento(lookAhead.palavra, deslocamento_cont_param, e_param);
-                /* tirar duvidas com Felipe em rela��o ao o que � esses deslocamentos .-. */
+                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
+                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "param");     //MODIFICA��O //revisar se esse param existe na linguagem cmm
 
                 while(enquanto_for_virgula){
                     if(Token.cat == SN && Token.tipo.codigo == VIRGULA ){
@@ -459,8 +452,6 @@ void cmd(){
 
                 expr();
 
-    //            proximo_Token();
-
                 if(!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA))
                     modulo_erros((Erro)PONTO_VIRGULA_ERRO);
 
@@ -471,7 +462,7 @@ void cmd(){
             case ABRE_CHAVES:
                 proximo_Token();
                 cmd();
-                proximo_Token();
+
                 if(!(Token.cat == SN && Token.tipo.codigo == FECHA_CHAVES)){
                     modulo_erros((Erro)FECHAMENTO_COMANDO_ERRO);
                 }
@@ -552,25 +543,18 @@ Boolean fator(){
 
         //FATOR ID([expr {',' expr}])
         if(Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE){
-            veioExpressao = 1;
+
             strcpy(id_func,Token.tipo.lexema);
 
             proximo_Token();
-            expr();
 
-            if(veioExpressao){
-                while(enquanto_for_virgula){
-                    if(Token.cat == SN && Token.tipo.codigo == VIRGULA){
+            if(expr()){
+                while(Token.cat == SN && Token.tipo.codigo == VIRGULA){
                         proximo_Token();
-                        expr();
 
-                        if(veioExpressao){
-                            enquanto_for_virgula = TRUE;
-                            proximo_Token();
-                        }
-                        else modulo_erros((Erro)EXPRESSAO_ERRO);
-                    }
-                    else enquanto_for_virgula = FALSE;
+                        if(!expr())
+                            modulo_erros((Erro)EXPRESSAO_ERRO);
+
                 }
             }
 
@@ -705,96 +689,95 @@ O compilador funcionar por completo. */
 // TODO: Codigos da tabela de simbolos.
 void adicionar_Tabela_Simbolos(char id_[], int escopo_, char tipo_[], char cat_[])
 {
-//  strcpy(tabela_Simbolos[posicao_atual].id, id_);
-//  tabela_Simbolos[posicao_atual].escopo=escopo_;
-//  strcpy(tabela_Simbolos[posicao_atual].tipo,  tipo_);
-//  strcpy(tabela_Simbolos[posicao_atual].cat,  cat_);
-//  tabela_Simbolos[posicao_atual].param_excluido=0;
-//
-//  posicao_atual++;
+  strcpy(tabela_Simbolos[posicao_atual].id, id_);
+  tabela_Simbolos[posicao_atual].escopo=escopo_;
+  strcpy(tabela_Simbolos[posicao_atual].tipo,  tipo_);
+  strcpy(tabela_Simbolos[posicao_atual].cat,  cat_);
+  tabela_Simbolos[posicao_atual].param_excluido=0;
+
+  posicao_atual++;
 }
 
 //TODO: pesquisar_Tabela_Simbolos
 void pesquisar_Tabela_Simbolos(char id_[], int escopo_recebido)
 {
-//   int x;
-//
-//   for(x=posicao_fixa;x<posicao_atual;x++)
-//   {
-//       if(!strcmp(tabela_Simbolos[x].id, id_) && tabela_Simbolos[x].param_excluido != 1)
-//       {
-//       	   if(tabela_Simbolos[x].escopo == escopo_recebido)
-//	       {
-//	       	     if(escopo_recebido==1) {
-//
-//					  printf("\nERRO VARIAVEL REDECLARADA EM ESCOPO LOCAL\n\n");
-//					  system("PAUSE");
-//			  	  }
-//			  	 else
-//			  	 {
-//			  	        if(escopo_recebido==0){
-//					 	   printf("\nERRO NOME REDECLARADO EM ESCOPO GLOBAL\n\n");
-//					       system("PAUSE");
-//					    }
-//				        else
-//				        {
-//				           printf("\nERRO NOME DE ASSINATURA REDECLARADA EM ESCOPO GLOBAL\n\n");
-//					       system("PAUSE");
-//						}
-//
-//				 }
-//
-//		   }
-//
-//	   }
-//
-//   }
+   int x;
+
+   for(x=posicao_fixa;x<posicao_atual;x++)
+   {
+       if(!strcmp(tabela_Simbolos[x].id, id_) && tabela_Simbolos[x].param_excluido != 1)
+       {
+       	   if(tabela_Simbolos[x].escopo == escopo_recebido)
+	       {
+	       	     if(escopo_recebido==1) {
+
+					  printf("\nERRO VARIAVEL REDECLARADA EM ESCOPO LOCAL\n\n");
+					  system("PAUSE");
+			  	  }
+			  	 else
+			  	 {
+			  	        if(escopo_recebido==0){
+					 	   printf("\nERRO NOME REDECLARADO EM ESCOPO GLOBAL\n\n");
+					       system("PAUSE");
+					    }
+				        else
+				        {
+				           printf("\nERRO NOME DE ASSINATURA REDECLARADA EM ESCOPO GLOBAL\n\n");
+					       system("PAUSE");
+						}
+
+				 }
+
+		   }
+
+	   }
+
+   }
 
 }
 
 //TODO: excluir_Tabela_Simbolos
 void excluir_Tabela_Simbolos()
 {
-//  int x;
-//
-//     for(x=posicao_fixa;x<posicao_atual;x++)
-//     {
-//          if(tabela_Simbolos[x].escopo == 1)
-//          {
-//              tabela_Simbolos[x].param_excluido=1;
-//          }
-//     }
+  int x;
+
+     for(x=posicao_fixa;x<posicao_atual;x++)
+     {
+          if(tabela_Simbolos[x].escopo == 1)
+          {
+              tabela_Simbolos[x].param_excluido=1;
+          }
+     }
 
 }
 
 //TODO: fazer listar_Tabela_Simbolos
 void listar_Tabela_Simbolos()
 {
-//	int x;
-//
-//     for(x=posicao_fixa;x<posicao_atual;x++)
-//     {
-//     	puts(tabela_Simbolos[x].id);
-//	 }
+	int x;
+
+     for(x=posicao_fixa;x<posicao_atual;x++)
+     {
+     	puts(tabela_Simbolos[x].id);
+	 }
 }
 
 
 void prog() {
     while (Token.cat != END){
 
-
     proximo_Token();
     Boolean eh_semretorno = FALSE;
 
-    if (Token.cat == CT_CD && Token.tipo.codigo == SEMRETORNO) {
+    if (Token.cat == PR && Token.tipo.codigo == SEMRETORNO) {
         eh_semretorno = TRUE;
     }
 
-    if (Token.cat == CT_CD && Token.tipo.codigo == PROTOTIPO) {
+    if (Token.cat == PR && Token.tipo.codigo == PROTOTIPO) {
 
         proximo_Token();
 
-        if (Token.cat == CT_CD && Token.tipo.codigo == SEMRETORNO) {
+        if (Token.cat == PR && Token.tipo.codigo == SEMRETORNO) {
             eh_semretorno = TRUE;
         }
 
@@ -802,11 +785,11 @@ void prog() {
             proximo_Token();
 
             if (Token.cat == ID) {
-//            strcpy(nome_func, Token.tipo.lexema);
-//
-//            //colocar as fun��es da tabela de simbolos depois
-//            pesquisar_Tabela_Simbolos(Token.tipo.lexema, 0);                     //MODIFICA��O
-//            adicionar_Tabela_Simbolos(Token.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
+            strcpy(nome_func, Token.tipo.lexema);
+
+            //colocar as fun��es da tabela de simbolos depois
+            pesquisar_Tabela_Simbolos(Token.tipo.lexema, 0);                     //MODIFICA��O
+            adicionar_Tabela_Simbolos(Token.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
 
                 proximo_Token();
 
@@ -814,8 +797,6 @@ void prog() {
                     proximo_Token();
 
                     tipos_p_opc();
-
-                    proximo_Token();
 
                     if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE) {
                         proximo_Token();
@@ -832,8 +813,6 @@ void prog() {
 
                                     tipos_p_opc();
 
-                                    proximo_Token();
-
                                     if (!(Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE)) {
                                         modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                                     }
@@ -842,8 +821,8 @@ void prog() {
                                     modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
                                 }
 
-//                                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
-//                                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
+                                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
+                                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
                                 eparam = 0;
                                 proximo_Token();
                             } else {
@@ -856,7 +835,7 @@ void prog() {
                             modulo_erros((Erro) PONTO_VIRGULA_ERRO);
                         }
                     } else {
-                        modulo_erros((Erro) ID_ERRO);
+                        modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                     }
                 }
 
@@ -871,11 +850,11 @@ void prog() {
         proximo_Token();
 
         if (Token.cat == ID) {
-//            strcpy(nome_func, Token.tipo.lexema);
+            strcpy(nome_func, Token.tipo.lexema);
 //
 //            //colocar as fun��es da tabela de simbolos depois
-//            pesquisar_Tabela_Simbolos(Token.tipo.lexema, 0);                     //MODIFICA��O
-//            adicionar_Tabela_Simbolos(Token.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
+            pesquisar_Tabela_Simbolos(Token.tipo.lexema, 0);                     //MODIFICA��O
+            adicionar_Tabela_Simbolos(Token.tipo.lexema, 0, tipo_id, "func");     //MODIFICA��O
 
             proximo_Token();
 
@@ -895,8 +874,8 @@ void prog() {
                             proximo_Token();
 
                             if (Token.cat == ID) {
-//                                    pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
-//                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O //verificar se o nome � var mesmo
+                                    pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
+                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O //verificar se o nome � var mesmo
                                 eparam = 0;
 
                                 proximo_Token();
@@ -906,8 +885,8 @@ void prog() {
                                     proximo_Token();
 
                                     if (Token.cat == ID) {
-//                                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
-//                                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
+                                                pesquisar_Tabela_Simbolos(Token.tipo.lexema, 1);                     //MODIFICA��O
+                                                adicionar_Tabela_Simbolos(Token.tipo.lexema, 1, tipo_id, "var");     //MODIFICA��O
                                         eparam = 0;
                                         proximo_Token();
                                     } else {
@@ -963,7 +942,7 @@ void prog() {
 
     excluir_Tabela_Simbolos();
 
-}
+    }
 }
 
 

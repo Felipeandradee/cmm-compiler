@@ -13,8 +13,12 @@ FLOAT = 45.755;
 TRIGGER = 1;
 
 inteiro SOMA(inteiro A){
-se (A >= B)
+
+se(0){}
+
+se (A >= B){
 	retorne A-B;
+	}
 senao
 	retorne A+B;
 }

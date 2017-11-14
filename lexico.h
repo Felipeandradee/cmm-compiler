@@ -45,7 +45,7 @@ typedef enum {
 
 
 typedef enum {
-        SEMRETORNO,
+        SEMRETORNO=1,
         CARACTER,
         INTEIRO,
         REAL,

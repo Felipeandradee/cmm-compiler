@@ -1,0 +1,48 @@
+/*************************/
+
+/* Comentario inicial
+*/
+
+/* Funcao soma */
+
+inteiro x;
+caracter c,d,e;
+real t;
+booleano v;
+
+prototipo inteiro soma(inteiro, inteiro b), subtracao(inteiro, inteiro);
+
+prototipo semretorno principal(semparam);
+
+inteiro soma(inteiro a, inteiro b) {
+
+    inteiro z;
+
+    z= a+b;
+    retorne z;
+}
+
+inteiro subtracao(inteiro x, inteiro y){
+
+	inteiro z;
+	
+	se(/*x > y ||*/ x==y){
+	
+		z = x -y;
+		
+	} senao
+		
+		z = y - x;
+	
+	retorne;
+
+}
+
+semretorno principal(semparam) {
+
+    inteiro x, y, z;
+
+    x=3; /*y | 5;*/ 
+    z=soma(x, y);
+    retorne;
+}

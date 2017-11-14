@@ -41,6 +41,7 @@
 		<Unit filename="sintatico.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="sintatico.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

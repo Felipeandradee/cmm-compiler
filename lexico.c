@@ -7,6 +7,7 @@
 
 int linha = 1;
 char pReservada[100][11] = {
+        {""},
     {"semretorno"},
     {"caracter"},
     {"inteiro"},
@@ -133,25 +134,18 @@ void montaToken(int cat, char lexema[], char ch, int pos) {
 }
 
 int searchPR(char lexema[]) {
-    int ativa;
-    int i;
-    ativa = 0;
-    i = 1;
+
+    int i = 1;
 
     while ((strcmp(pReservada[i], "") > 0)) {
         if ((strcmp(lexema, pReservada[i]) == 0)) {
-            ativa = 1;
-            break;
+            return i;
         }
         i++;
     }
-    if (ativa == 1) {
-        return i;
-    } else {
 
-        i = 0;
-        return i;
-    }
+    return 0;
+
 }
 
 void analexico() {
@@ -286,9 +280,11 @@ void analexico() {
                 int lpr = searchPR(lexema);
                 ungetc(ch, fp);
                 if(lpr){
-                    montaToken(PR, lexema, '\0', lpr);return;
+                    montaToken(PR, lexema, '\0', lpr);
+                    return;
                 }else{
-                    montaToken(ID, lexema, '\0', 0);return;
+                    montaToken(ID, lexema, '\0', 0);
+                    return;
                 }
             }
             case 4:
@@ -615,7 +611,7 @@ void analexico() {
             case 35:
             {
                 ch = getc(fp);
-                if (ch == '!') {
+                if (ch == '|') {
                     estado = 36;
                     lexema[cont] = ch;
                     cont++;
