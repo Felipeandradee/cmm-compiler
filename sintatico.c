@@ -639,6 +639,15 @@ Boolean fator(){
         return TRUE;
     }
 
+    //FATOR cadeiaccon
+    if(Token.cat == CT_CD){
+        veioExpressao = 1;
+        proximo_Token();
+//        strcpy(tipo_dado, "cadeiacon");
+
+        return TRUE;
+    }
+
     //Se n�o veio fator
     veioExpressao = 0;
     return FALSE;
