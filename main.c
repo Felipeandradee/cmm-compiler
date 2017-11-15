@@ -4,9 +4,9 @@
 
 int main() {
 
-//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd2.txt";
+    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd2.txt";
 //    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd1.txt";
-    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\TESTE.txt";
+//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\TESTE.txt";
 
 //    printf("digite o nome do arquivo para a analise l�xica:\n");
 //    scanf("%s", nome_arquivo_in);

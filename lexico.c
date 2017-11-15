@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "lexico.h"
-#define TAM 1001
+
 
 int linha = 1;
 char pReservada[100][11] = {

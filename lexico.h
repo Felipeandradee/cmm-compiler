@@ -2,6 +2,7 @@
 #define LEX_H_INCLUDED
 #include <stdio.h>
 #include <stdlib.h>
+#define TAM 1001
 
 FILE *fp;
 FILE *f_out;
@@ -65,7 +66,7 @@ typedef struct t {
     categoria cat;
 
     union {
-        char lexema[32];
+        char lexema[TAM];
         int codigo;
         int valor_int;
         float valor_real;

@@ -318,8 +318,6 @@ void cmd(){
         enquanto_for_comando = 1;
 
     }
-
-
     else if(Token.cat == ID){
             proximo_Token();
 
@@ -469,6 +467,7 @@ void cmd(){
                 //PONTO E V�RGULA
             case PONTO_VIRGULA:
                 enquanto_for_comando = 1;
+                proximo_Token();
             break;
 
             default:
@@ -515,7 +514,7 @@ Boolean expr_simp(){
 //expr, ok!
 Boolean expr(){
     if(expr_simp()){
-        if(!(Token.cat == SN /*&& Token.tipo.codigo == PONTO_VIRGULA*/))
+        if(!(Token.cat == SN ))
             proximo_Token();
 
         if(op_rel()){
@@ -580,11 +579,10 @@ Boolean fator(){
     }
 
     //FATOR (expr)
-    if(Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE){
+    else if(Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE){
         veioExpressao = 1;
         proximo_Token();
-        expr();
-        if(veioExpressao)
+        if(expr())
             proximo_Token();
         else
             modulo_erros((Erro)EXPRESSAO_ERRO);
@@ -599,7 +597,7 @@ Boolean fator(){
     }
 
     //FATOR "!" nega��o fator
-    if(Token.cat == SN && Token.tipo.codigo == NOT){
+    else if(Token.cat == SN && Token.tipo.codigo == NOT){
         veioExpressao = 1;
         proximo_Token();
         if(fator())
@@ -611,38 +609,32 @@ Boolean fator(){
     }
 
     //FATOR intcon
-    if(Token.cat == CT_I){
+    else if(Token.cat == CT_I){
         veioExpressao = 1;
-
-        proximo_Token();
         strcpy(tipo_dado, "inteiro");
 
         return TRUE;
     }
 
     //FATOR realcon
-    if(Token.cat == CT_R){
+    else if(Token.cat == CT_R){
         veioExpressao = 1;
-
-        proximo_Token();
         strcpy(tipo_dado, "real");
 
         return TRUE;
     }
 
     //FATOR caraccon
-    if(Token.cat == CT_C){
+    else if(Token.cat == CT_C){
         veioExpressao = 1;
-        proximo_Token();
         strcpy(tipo_dado, "caracter");
 
         return TRUE;
     }
 
     //FATOR cadeiaccon
-    if(Token.cat == CT_CD){
+    else if(Token.cat == CT_CD){
         veioExpressao = 1;
-        proximo_Token();
 //        strcpy(tipo_dado, "cadeiacon");
 
         return TRUE;
