@@ -1,0 +1,23 @@
+# depslib dependency file v1.0
+1510747673 source:c:\users\luck\desktop\github\cmm-compiler\lexico.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"lexico.h"
+
+1510747673 c:\users\luck\desktop\github\cmm-compiler\lexico.h
+	<stdio.h>
+	<stdlib.h>
+
+1510751880 source:c:\users\luck\desktop\github\cmm-compiler\main.c
+	<stdio.h>
+	<stdlib.h>
+	"sintatico.h"
+
+1510747673 c:\users\luck\desktop\github\cmm-compiler\sintatico.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lexico.h"
+

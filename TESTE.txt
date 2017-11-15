@@ -1,8 +1,1 @@
-semretorno principal(semparam) {
-
-     inteiro i, n;
-
-     para (i=0; i<n; i=i+1) 
-            imprima(fibonacci(i+1));
-     retorne;
-}
+prototipo real teste(inteiro, , inteiro);
