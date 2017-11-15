@@ -3,8 +3,6 @@
 #include <string.h>
 #include "sintatico.h"
 
-
-
 //TODO: revisar Lista de variaveis
 //int linha = 0; //proc_ = 0, func_ = 0;
 int enquanto_for_comando = 1;
@@ -18,16 +16,11 @@ int posicaoParametros; //posi��o dos parametros
 int contagemParametros; //contagem dos parametros
 int eparam; //� Parametro (variavel que verifica se � um parametro)
 
-//Token como global
-//TOKEN Token; //No de Felipinho � lookAhead
-//Encerramento da lista de variaveis.
-
 //TODO: Ver como vai ficar em questao do ultimo token
 void proximo_Token(){
     Token = TNext;
     if(Token.cat != END)
         analexico();
-
 }
 
 //TODO: revisar o modulo_erros
@@ -296,6 +289,7 @@ void tipos_p_opc(){
                     }
                     else
                         enquanto_for_virgula = FALSE;
+						modulo_erros((Erro)VIRGULA_ERRO);
                 }
             }
         else{
@@ -346,6 +340,11 @@ void cmd(){
                 proximo_Token();
             else
                 modulo_erros((Erro)FECHAMENTO_PARENTESE_ERRO);
+			
+			if(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)
+                proximo_Token();
+            else
+                modulo_erros((Erro)PONTO_VIRGULA_ERRO);
 
         }
         else
@@ -838,6 +837,8 @@ void prog() {
                     } else {
                         modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                     }
+                }else {
+                            modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
                 }
 
 
@@ -930,6 +931,11 @@ void prog() {
                         modulo_erros((Erro) ID_ERRO);
                     }
                     proximo_Token();
+					
+					if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)
+                        proximo_Token();
+                    else
+                        modulo_erros((Erro) PONTO_VIRGULA_ERRO);
                 }
 
             } else if (Token.tipo.codigo == PONTO_VIRGULA) {}

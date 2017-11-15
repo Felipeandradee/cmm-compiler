@@ -4,20 +4,15 @@
 
 int main() {
 
-    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd2.txt";
-//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd1.txt";
-//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\TESTE.txt";
-
-//    printf("digite o nome do arquivo para a analise l�xica:\n");
-//    scanf("%s", nome_arquivo_in);
-//
-//    printf("\ndigite o nome do arquivo para salvar os tokens:\n");
-//    scanf("%s", nome_arquivo_out);
+    //Caminho de teste de Felipe
+    //char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd2.txt";
+    //Caminho de testes de Lucas
+    char nome_arquivo_in[10000] = "C:\\Users\\Luck\\Desktop\\GItHub\\cmm-compiler\\TESTE.txt";
 
     printf("\nAnalisando o arquivo %s\n", nome_arquivo_in);
 	fp = abrirArquivo(nome_arquivo_in);
-//	f_out = salvarArquivo(nome_arquivo_out);
 
+	//Analisador lexico e sintatico
 	analexico();
     prog();
 
