@@ -22,26 +22,26 @@ typedef enum {
 } categoria;
 
 typedef enum {
-    		OR,
-            AND,
-            NOT,
-            MULTIPLICACAO,
-            DIVISAO,
-            SOMA,
-            SUBTRACAO,
-            MENOR,
-            MENORIGUAL,
-            MAIOR,
-            MAIORIGUAL,
-            IGUAL,
-            ATRIBUICAO,
-            DIFERENTE,
-            VIRGULA,
-            PONTO_VIRGULA,
-            ABRE_PARENTESE,
-            FECHA_PARENTESE,
-            ABRE_CHAVES,
-            FECHA_CHAVES
+    		OR=0,
+            AND=1,
+            NOT=2,
+            MULTIPLICACAO=3,
+            DIVISAO=4,
+            SOMA=5,
+            SUBTRACAO=6,
+            MENOR=7,
+            MENORIGUAL=8,
+            MAIOR=9,
+            MAIORIGUAL=10,
+            IGUAL=11,
+            ATRIBUICAO=12,
+            DIFERENTE=13,
+            VIRGULA=14,
+            PONTO_VIRGULA=15,
+            ABRE_PARENTESE=16,
+            FECHA_PARENTESE=17,
+            ABRE_CHAVES=18,
+            FECHA_CHAVES=19
 } sinais;
 
 

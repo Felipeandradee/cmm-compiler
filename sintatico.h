@@ -9,13 +9,23 @@
 
 //estrutura boolean
 typedef
-   enum{TRUE=1,FALSE=0}
+    enum{TRUE=1,FALSE=0}
 Boolean;
 
-////estrutura boolean
-//typedef
-//   enum{GLOBAL=1,LOCAL=0}
-//Escopo;
+//estrutura Escopo
+typedef
+    enum{LOCAL=1,GLOBAL=0}
+Escopo;
+
+//estrutura tiposimbolo
+typedef enum{
+        VARIAVEL=1,
+        FUNCAO,
+        FUNCAO_PROTOTIPO,
+        PARAMETRO,
+
+} TipoSimbolo;
+
 
 //Estrutura para analise de erros.
 typedef
@@ -29,26 +39,27 @@ Erro;
 typedef
    struct
    {
-      char id[32];
-      int escopo;
-	  char tipo[15];
-      char cat[15];
-      int  qtd_param;
-      int  param_excluido;
-      int  deslocamento;
-      char label[8];
-      char parametros[20][8];
+       char id[32];
+       Escopo escopo;
+       TipoSimbolo tipo;
+       Boolean zumbi;
    }
 tabela;
 
 //variaveis
 char tipo_id[20];
 char tipo_dado[15];
-char tipo_dado1[15];
 char nome_func[15];
+int topo_pilha;
 
 //Tabela de simbolos.
 tabela tabela_Simbolos[1000];
+void adicionar_Tabela_Simbolos(char id_[], Escopo escopo_, TipoSimbolo tipo_);
+void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo tipo_);
+void excluir_Tabela_Simbolos();
+void listar_Tabela_Simbolos();
+
+
 
 Boolean expr();
 Boolean fator();

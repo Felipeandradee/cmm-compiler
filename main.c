@@ -5,9 +5,9 @@
 int main() {
 
     //Caminho de teste de Felipe
-    //char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\cd2.txt";
+    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\fibonacci.cmm";
     //Caminho de testes de Lucas
-    char nome_arquivo_in[10000] = "C:\\Users\\Luck\\Desktop\\GItHub\\cmm-compiler\\TESTE.txt";
+//    char nome_arquivo_in[10000] = "C:\\Users\\Luck\\Desktop\\GItHub\\cmm-compiler\\TESTE.txt";
 
     printf("\nAnalisando o arquivo %s\n", nome_arquivo_in);
 	fp = abrirArquivo(nome_arquivo_in);
