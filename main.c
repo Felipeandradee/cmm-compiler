@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "sintatico.h"
+#include "AnaSint.h"
 
 int main() {
 

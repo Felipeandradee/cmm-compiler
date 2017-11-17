@@ -21,3 +21,38 @@
 	<string.h>
 	"lexico.h"
 
+1510884632 source:c:\users\felip\codeblocksprojects\cmm-compiler\main.c
+	<stdio.h>
+	<stdlib.h>
+	"AnaSint.h"
+
+1510885615 c:\users\felip\codeblocksprojects\cmm-compiler\anasint.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Analex.h"
+	"GerenciadorTS.h"
+
+1510869226 c:\users\felip\codeblocksprojects\cmm-compiler\analex.h
+	<stdio.h>
+	<stdlib.h>
+
+1510886120 c:\users\felip\codeblocksprojects\cmm-compiler\gerenciadorts.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"Analex.h"
+
+1510884632 source:c:\users\felip\codeblocksprojects\cmm-compiler\analex.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"Analex.h"
+
+1510886120 source:c:\users\felip\codeblocksprojects\cmm-compiler\anasint.c
+	"AnaSint.h"
+
+1510885161 source:c:\users\felip\codeblocksprojects\cmm-compiler\gerenciadorts.c
+	"GerenciadorTS.h"
+

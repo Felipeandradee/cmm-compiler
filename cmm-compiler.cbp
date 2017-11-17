@@ -31,17 +31,21 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="lexico.c">
+		<Unit filename="AnaSint.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="lexico.h" />
+		<Unit filename="AnaSint.h" />
+		<Unit filename="Analex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Analex.h" />
+		<Unit filename="GerenciadorTS.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="GerenciadorTS.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="sintatico.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="sintatico.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

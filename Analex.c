@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "lexico.h"
+#include "Analex.h"
 
 
 int linha = 1;
