@@ -1,3 +1,0 @@
-C:/Users/Luck/Desktop/GItHub/cmm-compiler/cmake-build-debug/CMakeFiles/cmm_compiler.dir
-C:/Users/Luck/Desktop/GItHub/cmm-compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Luck/Desktop/GItHub/cmm-compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
