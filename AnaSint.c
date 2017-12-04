@@ -1,10 +1,15 @@
 #include "AnaSint.h"
 
 int enquanto_for_comando = 1;
-int tipo_proc=0; //Variavel que indica se Ã© um procedimento ou funcÃ£o.
-estrutura_fp ssinatura_atual; //Assinatura das funÃ§Ãµes e procedimentos, utilizado para analise semÃ¢ntica
-int posicao_parametros=0; //Variavel que indica a posiÃ§Ã£o atual do parametro na assinatura da funÃ§Ã£o
-int contagem_parametros=0; //Variavel que indica a quantidade de parametros de uma assinatura de uma funÃ§Ã£o ou procedimento
+int tipo_proc=0; //Variavel que indica se é um procedimento ou funcão.
+estrutura_fp assinatura_atual; //Assinatura das funções e procedimentos, utilizado para analise semântica
+int posicao_parametros=0; //Variavel que indica a posição atual do parametro na assinatura da função
+int contagem_parametros=0; //Variavel que indica a quantidade de parametros de uma assinatura de uma função ou procedimento
+
+//Analisar a condição dessas variaveis, são utilizadas na analise semântica e na tabela de simbolos
+int  posicao_fixa=0;
+int  posicao_atual=0;
+int result;
 
 void proximo_Token() {
     Token = TNext;
@@ -86,7 +91,7 @@ void modulo_erros(Erro tipo_erro) {
 
         /*
         case PROTOTIPO_ERROR:
-			 	printf("\n\nERRO SEMANTICO NA LINHA %d, DECLARE ASSINATURA ANTES DE FUNCÃƒO OU PROCEDIMENTO!\n\n", contador_De_Linhas_s);
+			 	printf("\n\nERRO SEMANTICO NA LINHA %d, DECLARE ASSINATURA ANTES DE FUNCÃO OU PROCEDIMENTO!\n\n", linha);
                 system("PAUSE");
 			 break;
 
@@ -94,7 +99,27 @@ void modulo_erros(Erro tipo_erro) {
         */
 
         case ASSINATURA_RETORNO_ERROR:
-            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DO RETORNO DA ASSINATURA DIFERENTE DO TIPO EM FUNC!\n\n", contador_De_Linhas_s);
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DO RETORNO DA ASSINATURA DIFERENTE DO TIPO EM FUNC!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case QUANTIDADE_ARGUMENTOS_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, QUANTIDADE DE ARGUMENTOS EM FUNC OU PROC DIFERENTE DA ASSINATURA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ARGUMENTO_INVALIDO_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DE ARGUMENTO DIFERENTE DA ASSINATURA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case ID_NAO_ENCONTRADO_ERROR:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, NAO POSSUI ASSINATURA!\n\n", linha);
+            system("PAUSE");
+            break;
+
+        case TIPO_INCOMPATIVEL_ERRO:
+            printf("\n\nERRO SEMANTICO NA LINHA %d, TIPOS INCOMPATIVEIS!\n\n", linha);
             system("PAUSE");
             break;
     }
@@ -103,29 +128,37 @@ void modulo_erros(Erro tipo_erro) {
 Boolean tipo() {
 
     if ((Token.cat == PR && Token.tipo.codigo == CARACTER)) {
+    	strcpy(tipo_id, "caracter");
         return TRUE;
     }
     if (Token.cat == PR && Token.tipo.codigo == INTEIRO) {
+    	strcpy(tipo_id, "inteiro");
         return TRUE;
     }
     if (Token.cat == PR && Token.tipo.codigo == REAL) {
+    	strcpy(tipo_id, "real");
         return TRUE;
     }
     if (Token.cat == PR && Token.tipo.codigo == BOOLEANO) {
-        return TRUE;
+        strcpy(tipo_id, "booleano");
+		return TRUE;
     }
 
     return FALSE;
 }
 
 void atrib() {
-    if (Token.cat == ID) {
-        proximo_Token();
+	
+	if (Token.cat == ID) {
+	result = pesquisar_Tipo(Token.tipo.lexema, tipo_id, VARIAVEL);
+		
+		proximo_Token();
 
         if (Token.cat == SN && Token.tipo.codigo == ATRIBUICAO) {
             proximo_Token();
 
-            if (!expr())
+            
+			if (!expr())
                 modulo_erros((Erro) EXPR_ERRO);
 
         } else modulo_erros((Erro) ATRIBUICAO_ERRO);
@@ -149,7 +182,7 @@ void tipos_param() {
 
             if (Token.cat == ID) {
                 pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
-                adicionar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
+                adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, PARAMETRO);
 
                 proximo_Token();
 
@@ -166,7 +199,7 @@ void tipos_param() {
 
                             if (Token.cat == ID) {
                                 pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
-                                adicionar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
+                                adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, PARAMETRO);
 
                                 proximo_Token();
                                 enquanto_for_virgula = TRUE;
@@ -184,13 +217,12 @@ void tipos_param() {
             modulo_erros((Erro) TIPO_ERRO);
         }
     }
+posicao_parametros=0;
 
-    posicao_parametros=0;
+//if(!tipo_proc) pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,1,contagem_parametros);
+//else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,0,contagem_parametros);}
 
-    if(!tipo_proc) pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,1,contagem_parametros);
-    else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,0,contagem_parametros);}
-
-    contagem_parametros=0;
+contagem_parametros=0;
 }
 
 void tipos_p_opc() {
@@ -203,7 +235,7 @@ void tipos_p_opc() {
 
             if (Token.cat == ID) {
                 pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
-                adicionar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
+                adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, PARAMETRO);
 
                 proximo_Token();
             }
@@ -218,7 +250,7 @@ void tipos_p_opc() {
 
                         if (Token.cat == ID) {
                             pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
-                            adicionar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
+                            adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, PARAMETRO);
 
                             proximo_Token();
                         }
@@ -379,7 +411,7 @@ void cmd() {
                 break;
 
                 //retorne
-            case RETORNE:   //Ver a questï¿½o do permitir por cadeia vazia e fazer a questï¿½o do ponto e virgula
+            case RETORNE:   //Ver a quest?o do permitir por cadeia vazia e fazer a quest?o do ponto e virgula
                 proximo_Token();
 
                 expr();
@@ -446,11 +478,25 @@ Boolean expr_simp() {
 
 Boolean expr() {
     if (expr_simp()) {
-
+        strcpy(tipo_dado_1,tipo_dado);
+        
+        //Analise semântica: Consistência de tipos na atribuição.
+        if(result == 1)
+        	strcpy(tipo_dado_2,"inteiro");
+        if(result == 2)
+        	strcpy(tipo_dado_2,"caracter");
+        if(result == 3)
+        	strcpy(tipo_dado_2,"real");	
+        
+		verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
+		
         if (op_rel()) {
             proximo_Token();
             if (!expr_simp())
                 modulo_erros((Erro) EXPR_SIMP_ERRO);
+
+            strcpy(tipo_dado_2,tipo_dado);
+            verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
         }
         return TRUE;
     }
@@ -511,7 +557,7 @@ Boolean fator() {
         return TRUE;
     }
 
-        //FATOR "!" negaï¿½ï¿½o fator
+        //FATOR "!" nega??o fator
     else if (Token.cat == SN && Token.tipo.codigo == NOT) {
         proximo_Token();
         if (fator())
@@ -524,8 +570,9 @@ Boolean fator() {
 
         //FATOR intcon
     else if (Token.cat == CT_I) {
-        proximo_Token();
+		proximo_Token();
 
+        strcpy(tipo_dado, "inteiro"); //Copia para comparação de tipos na analise semântica
         return TRUE;
     }
 
@@ -533,6 +580,7 @@ Boolean fator() {
     else if (Token.cat == CT_R) {
         proximo_Token();
 
+        strcpy(tipo_dado, "real");
         return TRUE;
     }
 
@@ -540,6 +588,7 @@ Boolean fator() {
     else if (Token.cat == CT_C) {
         proximo_Token();
 
+        strcpy(tipo_dado, "caracter");
         return TRUE;
     }
 
@@ -607,7 +656,7 @@ void prog() {
                 if (Token.cat == ID) {
 
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO_PROTOTIPO);
-                    adicionar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO_PROTOTIPO);
+                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, FUNCAO_PROTOTIPO);
 
                     proximo_Token();
 
@@ -625,7 +674,7 @@ void prog() {
 
                                 if (Token.cat == ID) {
                                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO_PROTOTIPO);
-                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO_PROTOTIPO);
+                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, FUNCAO_PROTOTIPO);
                                     proximo_Token();
 
                                     if ((Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE)) {
@@ -670,10 +719,10 @@ void prog() {
 
                 if (TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE) {
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO);
-                    adicionar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO);
+                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, FUNCAO);
                 } else {
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
-                    adicionar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
+                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
                 }
 
 
@@ -697,7 +746,7 @@ void prog() {
                                 if (Token.cat == ID) {
                                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL,
                                                               VARIAVEL);
-                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, LOCAL,
+                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL,
                                                               VARIAVEL);
 
                                     proximo_Token();
@@ -708,7 +757,7 @@ void prog() {
 
                                         if (Token.cat == ID) {
                                             pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
-                                            adicionar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
+                                            adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, VARIAVEL);
                                             proximo_Token();
                                         } else {
                                             modulo_erros((Erro) ID_ERRO);
@@ -745,7 +794,7 @@ void prog() {
                     while (Token.tipo.codigo == VIRGULA) {
                         proximo_Token();
                         pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
-                        adicionar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
+                        adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
 
                         if (Token.cat != ID) {
                             modulo_erros((Erro) ID_ERRO);
@@ -764,7 +813,7 @@ void prog() {
                             modulo_erros((Erro) PONTO_VIRGULA_ERRO);
                     }
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
-                    adicionar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
+                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
                 } else if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) {
                 } else
                     modulo_erros((Erro) PONTO_VIRGULA_ERRO);
@@ -775,86 +824,119 @@ void prog() {
     }
 }
 
-//Erros semÃ¢nticos
+//Erros semânticos
 
-//Compara a assinatura da funÃ§Ã£o e procedimento com suas devidas definiÃ§Ãµes
-void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametros[][8],int sinal, int num_parametros)
-{
-    int posicao_assinaturas, posicao_param_func, achou_id=0, x;
+//Revisar essa estrutura da assinatura posteriormente
+//Compara a assinatura da função e procedimento com suas devidas definições
+//void pesquisar_assinatura(int tipo_recebido,char id_recebido[],char parametros[][8],int sinal, int num_parametros){
+//    //Sinal: 1 para indicar função, 0 para indicar procedimento (ou é o contrário)
+//
+//    int posicao_assinaturas, posicao_param_func, achou_id=0, x;
+//
+//    if(sinal){
+//
+//        for(x=posicao_fixa;x<posicao_atual;x++) {
+//
+//            //Verifica se possui o mesmo id da assinatura
+//            if(!strcmp(tabela_Simbolos[x].id, id_recebido) /*&& !strcmp(tabela_Simbolos[x].cat, "fwd_func")*/){ //verificar esta validação com Felipe
+//                achou_id=1;
+//
+//                //Tipo recebido não pode ser int (Lucas)
+//                if(tabela_Simbolos[x].tipo == tipo_recebido){  //Verifia se possui mesmo tipo de retorno da assinatura
+//
+//                    //Verifica a quantidade de argumentos da assinatura em relação a func
+//                    if(tabela_Simbolos[x].qtd_param == num_parametros){
+//
+//                        if(strcmp(parametros[0],"semparam") != 0){
+//
+//                            //Verifica se os tipos dos argumentos da função são os mesmos da assinatura
+//                            for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
+//                            {
+//                                if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
+//                                    modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
+//                            }
+//
+//                        }
+//
+//                    }else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
+//
+//                }
+//                else modulo_erros((Erro)ASSINATURA_RETORNO_ERROR);
+//            }
+//
+//        }
+//
+//        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
+//    }
+//    else if(sinal == 0){
+//
+//        for(x=posicao_fixa;x<posicao_atual;x++) {
+//
+//            //Verifica se possui o mesmo id da assinatura
+//            if(!strcmp(tabela_Simbolos[x].id, id_recebido) /*&& !strcmp(tabela_Simbolos[x].cat, "fwd_proc")*/){
+//                achou_id=1;
+//
+//                //Verifica a quantidade de argumentos de proc em relação a assinatura
+//                if(tabela_Simbolos[x].qtd_param == num_parametros){
+//
+//                    if(strcmp(parametros[0],"semparam") != 0){
+//                        //Verifica se os tipos dos argumentos de proc são os mesmos da assinatura
+//                        for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++){
+//                            if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
+//                                modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
+//                        }
+//
+//                    }
+//
+//                } else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
+//            }
+//        }
+//
+//        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
+//
+//    }
+//
+//}
 
-    if(sinal)
-    {
+void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
+  int tipo_dado;
 
-        for(x=posicao_fixa;x<posicao_atual;x++) {
+  if(!strcmp(tipo1, "inteiro"))  tipo_dado=1;
+  if(!strcmp(tipo1, "caracter")) tipo_dado=2;
+  if(!strcmp(tipo1, "real")) tipo_dado=3;
 
 
-            //Verifica se possui o mesmo id da assinatura
-            if(!strcmp(tabela_Simbolos[x].id, id_recebido) && !strcmp(tabela_Simbolos[x].cat, "fwd_func"))
-            {
-                achou_id=1;
-
-                if(!strcmp(tabela_Simbolos[x].tipo,tipo_recebido))  //Verifia se possui mesmo tipo de retorno da assinatura
+				switch(tipo_dado)
                 {
 
-                    //Verifica a quantidade de argumentos da assinatura em relaÃ§Ã£o a func
-                    if(tabela_Simbolos[x].qtd_param == num_parametros)
-                    {
+				  //INT
+                  case 1:
 
+				      if(strcmp(tipo2,"inteiro") != 0)
+			          {
+						 if(strcmp(tipo2,"caracter") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
 
-                        if(strcmp(parametros[0],"noparam") != 0)
-                        {
+					  }
+				      strcpy(tipo_retorno, "inteiro");
+				  break;
 
-                            //Verifica se os tipos dos argumentos da funÃ§Ã£o sÃ£o os mesmos da assinatura
-                            for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
-                            {
-                                if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
-                                    modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
-                            }
+			      //CHAR
+				  case 2:
 
-                        }
+				      if(strcmp(tipo2,"caracter") != 0)
+			          {
+						 if(strcmp(tipo2,"inteiro") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
+					  }
+					  strcpy(tipo_retorno, "caracter");
+				  break;
 
-                    }else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
+				  //REAL
+				  case 3:
+					  if(strcmp(tipo2,"real") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
+					  strcpy(tipo_retorno, "real");
+				  break;
 
-                }
-                else modulo_erros((Erro)ASSINATURA_RETORNO_ERROR);
-            }
-
-        }
-
-        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
-    }
-    else if(sinal == 0)
-    {
-
-        for(x=posicao_fixa;x<posicao_atual;x++) {
-
-            //Verifica se possui o mesmo id da assinatura
-            if(!strcmp(tabela_Simbolos[x].id, id_recebido) && !strcmp(tabela_Simbolos[x].cat, "fwd_proc"))
-            {
-                achou_id=1;
-
-                //Verifica a quantidade de argumentos de proc em relaÃ§Ã£o a assinatura
-                if(tabela_Simbolos[x].qtd_param == num_parametros)
-                {
-
-                    if(strcmp(parametros[0],"noparam") != 0)
-                    {
-                        //Verifica se os tipos dos argumentos de proc sÃ£o os mesmos da assinatura
-                        for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
-                        {
-                            if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
-                                modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
-                        }
-
-                    }
-
-                } else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
-            }
-        }
-
-        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
-
-    }
+			   }
 
 }
 

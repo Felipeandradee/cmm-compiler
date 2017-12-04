@@ -3,8 +3,11 @@
 int base_pilha = 0;
 int topo_pilha = 0;
 
-void adicionar_Tabela_Simbolos(char id_[], Escopo escopo_, TipoSimbolo tipo_) {
+
+
+void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] ,Escopo escopo_, TipoSimbolo tipo_) {
     strcpy(tabela_Simbolos[topo_pilha].id, id_);
+    strcpy(tabela_Simbolos[topo_pilha].tipoVariavel, tipoDaVariavel);
     tabela_Simbolos[topo_pilha].escopo = escopo_;
     tabela_Simbolos[topo_pilha].tipo = tipo_;
     tabela_Simbolos[topo_pilha].zumbi = FALSE;
@@ -37,6 +40,38 @@ void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo t
 
 }
 
+int pesquisar_Tipo(char id_[],char tipoDaVariavel[], TipoSimbolo tipo_) {
+    int caracter, inteiro, real;
+    
+	int x;
+
+    for (x = topo_pilha - 1; x >= base_pilha; x--) {
+        if (!strcmp(tabela_Simbolos[x].id, id_) && tabela_Simbolos[x].zumbi == FALSE
+            && tabela_Simbolos[x].tipo != PARAMETRO) {
+            if (tipo_ == FUNCAO && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO)
+                continue;
+                
+            if(!strcmp(tabela_Simbolos[x].tipoVariavel, "inteiro")){
+				inteiro = 1;
+            	return inteiro;
+			}
+            	
+            if(!strcmp(tabela_Simbolos[x].tipoVariavel, "caracter")){
+            	caracter = 2;
+            	return caracter;
+			}
+            
+            if(!strcmp(tabela_Simbolos[x].tipoVariavel, "real")){
+            	real = 3;
+            	return real;
+			}
+
+        }
+
+    }
+
+}
+
 void excluir_Tabela_Simbolos() {
 
     while (tabela_Simbolos[topo_pilha - 1].escopo == LOCAL
@@ -58,3 +93,5 @@ void listar_Tabela_Simbolos() {
         printf(tabela_Simbolos[x].id);
     }
 }
+
+

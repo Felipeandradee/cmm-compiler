@@ -18,7 +18,7 @@ typedef
 enum {
     LOCAL = 1, GLOBAL = 0
 }
-        Escopo;
+Escopo;
 
 //estrutura tiposimbolo
 typedef enum {
@@ -33,24 +33,31 @@ typedef enum {
 typedef
 struct {
     char id[32];
+    char tipoVariavel[20];
     Escopo escopo;
     TipoSimbolo tipo;
     Boolean zumbi;
+    int  qtd_param;
+    char parametros[20][8];
 }
-        tabela;
+tabela;
 
+char tipo_id[20]; //Para capturar o id atual da variavel
 //variaveis
-int topo_pilha;
+//int topo_pilha;
 
 //Tabela de simbolos.
 tabela tabela_Simbolos[1000];
 
-void adicionar_Tabela_Simbolos(char id_[], Escopo escopo_, TipoSimbolo tipo_);
+void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] , Escopo escopo_, TipoSimbolo tipo_);
 
 void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo tipo_);
+
+int pesquisar_Tipo(char id_[],char tipoDaVariavel[], TipoSimbolo tipo_);
 
 void excluir_Tabela_Simbolos();
 
 void listar_Tabela_Simbolos();
 
 #endif // GERENCIADOR_H_INCLUDED
+
