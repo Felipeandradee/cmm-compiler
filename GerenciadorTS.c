@@ -1,4 +1,5 @@
 #include "GerenciadorTS.h"
+#include "AnaSint.h"
 
 int base_pilha = 0;
 int topo_pilha = 0;
@@ -94,4 +95,112 @@ void listar_Tabela_Simbolos() {
     }
 }
 
+void addParamFunc(char id2[]){
+	char idAux[50];
+	int x, qtd;
+	  
+    for(x = topo_pilha - 1; x >= base_pilha; x--)
+    {
+        if(!strcmp(tabela_Simbolos[x].id, id2) && tabela_Simbolos[x].qtd_param != 0 )
+     	{
+     		strcpy(idAux,tabela_Simbolos[x].id);
+			qtd = tabela_Simbolos[x].qtd_param;
+			
+			for(x = topo_pilha - 1; x >= base_pilha; x--){
+				if(!strcmp(idAux, tabela_Simbolos[x].id) && tabela_Simbolos[x].qtd_param == 0)
+					tabela_Simbolos[x].qtd_param = qtd; 	
+			}		
+		}
+	}
+}
+
+void adicionar_qtd_param(int qtd, char id_[]) //Guarda a quantidade de  parâmetros na tabela de símbolos
+{
+    int x;
+	  
+     for(x = topo_pilha - 1; x >= base_pilha; x--)
+     {
+          if(!strcmp(tabela_Simbolos[x].id, id_))
+     	  {
+     	     tabela_Simbolos[x].qtd_param = qtd;
+		  }
+	 }
+
+}
+
+void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametros[][8],int sinal, int num_parametros){
+    //Sinal: 1 para indicar função, 0 para indicar procedimento (ou é o contrário)
+    int posicao_assinaturas, posicao_param_func, achou_id=0, x;
+    char idAux1[50];
+
+    if(sinal){
+
+        for(x = topo_pilha - 1; x >= base_pilha; x--) {
+
+            //Verifica se possui o mesmo id da assinatura
+            if(!strcmp(tabela_Simbolos[x].id, id_recebido) /*&& !strcmp(tabela_Simbolos[x].cat, "fwd_func")*/){ //verificar esta validação com Felipe
+                achou_id=1;
+				
+                //Tipo recebido não pode ser int (Lucas)
+                if(!strcmp(tabela_Simbolos[x].tipoVariavel, tipo_recebido)){  //Verifia se possui mesmo tipo de retorno da assinatura
+
+					strcpy(idAux1,id_recebido);	
+					if(tabela_Simbolos[x].tipo != FUNCAO_PROTOTIPO)  //Para colocar mesma quantidade de parametros na funão da assinatura
+			 			addParamFunc(idAux1);  
+			 			
+                    //Verifica a quantidade de argumentos da assinatura em relação a func
+                    if(tabela_Simbolos[x].qtd_param == num_parametros){
+						
+						/*
+                        if(strcmp(parametros[0],"semparam") != 0){
+
+                            //Verifica se os tipos dos argumentos da função são os mesmos da assinatura (Concertar aqui !!)
+                            for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
+                            {
+                                if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
+                                    modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
+                            }
+
+                        }
+                        */
+
+                    }else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
+
+                }
+                else modulo_erros((Erro)ASSINATURA_RETORNO_ERROR);
+            }
+
+        }
+
+        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
+    }
+    else if(sinal == 0){
+
+        for(x = topo_pilha - 1; x >= base_pilha; x--) {
+
+            //Verifica se possui o mesmo id da assinatura
+            if(!strcmp(tabela_Simbolos[x].id, id_recebido) /*&& !strcmp(tabela_Simbolos[x].cat, "fwd_proc")*/){
+                achou_id=1;
+
+                //Verifica a quantidade de argumentos de proc em relação a assinatura
+                if(tabela_Simbolos[x].qtd_param == num_parametros){
+
+                    if(strcmp(parametros[0],"semparam") != 0){
+                        //Verifica se os tipos dos argumentos de proc são os mesmos da assinatura
+                        for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++){
+                            if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
+                                modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
+                        }
+
+                    }
+
+                } else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
+            }
+        }
+
+        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
+
+    }
+
+}
 

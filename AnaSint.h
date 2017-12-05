@@ -20,7 +20,7 @@ Erro;
 //Estrutura de funções e procedimentos que define: Tipo, Nome, Quantidade de parametros,etc.
 typedef
    struct{
-       char tipo[50];
+       char tipo[500];
        char id[100];
        int  tipo_func;
        int  num_param;
@@ -31,6 +31,7 @@ typedef
 char tipo_dado_1[15],tipo_dado_2[15], tipo_dado[15], tipo_retorno[15];
 
 void verificar_consistencia_tipos(char tipo1[], char tipo2[]);
+
 Boolean expr();
 Boolean fator();
 Boolean op_rel();

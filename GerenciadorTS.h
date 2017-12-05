@@ -20,7 +20,7 @@ enum {
 }
 Escopo;
 
-//estrutura tiposimbolo
+//estrutura tiposimbolo     //Não tem estrutura para procedimento?
 typedef enum {
     VARIAVEL = 1,
     FUNCAO,
@@ -54,6 +54,12 @@ void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] , Escopo escopo
 void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo tipo_);
 
 int pesquisar_Tipo(char id_[],char tipoDaVariavel[], TipoSimbolo tipo_);
+
+void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametros[][8],int sinal, int num_parametros);
+
+void adicionar_qtd_param(int qtd, char id_[]); //Add os parametros da assinatura
+
+void addParamFunc(char id2[]); //Add o numero de parametros da assinatura na função propriamente dita
 
 void excluir_Tabela_Simbolos();
 
