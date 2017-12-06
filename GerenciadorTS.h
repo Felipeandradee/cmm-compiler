@@ -61,6 +61,10 @@ void adicionar_qtd_param(int qtd, char id_[]); //Add os parametros da assinatura
 
 void addParamFunc(char id2[]); //Add o numero de parametros da assinatura na função propriamente dita
 
+void addParamFunc2(char id2[], int posicaoParam);
+
+void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[]);
+
 void excluir_Tabela_Simbolos();
 
 void listar_Tabela_Simbolos();

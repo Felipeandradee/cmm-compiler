@@ -98,17 +98,38 @@ void listar_Tabela_Simbolos() {
 void addParamFunc(char id2[]){
 	char idAux[50];
 	int x, qtd;
-	  
+	
     for(x = topo_pilha - 1; x >= base_pilha; x--)
     {
         if(!strcmp(tabela_Simbolos[x].id, id2) && tabela_Simbolos[x].qtd_param != 0 )
      	{
      		strcpy(idAux,tabela_Simbolos[x].id);
-			qtd = tabela_Simbolos[x].qtd_param;
-			
+			qtd = tabela_Simbolos[x].qtd_param;	
+					
 			for(x = topo_pilha - 1; x >= base_pilha; x--){
-				if(!strcmp(idAux, tabela_Simbolos[x].id) && tabela_Simbolos[x].qtd_param == 0)
+				if(!strcmp(idAux, tabela_Simbolos[x].id) && tabela_Simbolos[x].qtd_param == 0){
 					tabela_Simbolos[x].qtd_param = qtd; 	
+				}
+			}		
+		}
+	}
+}
+
+void addParamFunc2(char id2[], int posicaoParam){
+	char idAux[50], params[50];
+	int x, qtd;
+	
+    for(x = topo_pilha - 1; x >= base_pilha; x--)
+    {
+        if(!strcmp(tabela_Simbolos[x].id, id2) && strcmp(tabela_Simbolos[x].parametros[posicaoParam], "\000")) 
+     	{
+     		strcpy(idAux,tabela_Simbolos[x].id);
+			strcpy(params,tabela_Simbolos[x].parametros[posicaoParam]);
+					
+			for(x = topo_pilha - 1; x >= base_pilha; x--){
+				if(!strcmp(idAux, tabela_Simbolos[x].id) && !strcmp(tabela_Simbolos[x].parametros[posicaoParam], "\000")){
+					strcpy(tabela_Simbolos[x].parametros[posicaoParam],params);
+				}
 			}		
 		}
 	}
@@ -124,6 +145,23 @@ void adicionar_qtd_param(int qtd, char id_[]) //Guarda a quantidade de  parâmetr
      	  {
      	     tabela_Simbolos[x].qtd_param = qtd;
 		  }
+	 }
+
+}
+
+//Guarda os tipos dos parâmetros numa matriz na tabela de símbolos
+void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[])
+{
+   int x;
+	  
+     for(x = topo_pilha - 1; x >= base_pilha; x--)
+     {
+
+          if(!strcmp(tabela_Simbolos[x].id, id_))
+     	  {
+             strcpy(tabela_Simbolos[x].parametros[posicao_parametro], tipo_Param); 
+	      }
+	 	 
 	 }
 
 }
@@ -151,18 +189,20 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
                     //Verifica a quantidade de argumentos da assinatura em relação a func
                     if(tabela_Simbolos[x].qtd_param == num_parametros){
 						
-						/*
+						
                         if(strcmp(parametros[0],"semparam") != 0){
 
                             //Verifica se os tipos dos argumentos da função são os mesmos da assinatura (Concertar aqui !!)
                             for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
                             {
+                            	addParamFunc2(idAux1, posicao_param_func);
+                            	
                                 if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
                                     modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
                             }
 
                         }
-                        */
+                        
 
                     }else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
 

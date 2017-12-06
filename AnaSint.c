@@ -89,15 +89,6 @@ void modulo_erros(Erro tipo_erro) {
             system("PAUSE");
             break;
 
-        /*
-        case PROTOTIPO_ERROR:
-			 	printf("\n\nERRO SEMANTICO NA LINHA %d, DECLARE ASSINATURA ANTES DE FUNCÃO OU PROCEDIMENTO!\n\n", linha);
-                system("PAUSE");
-			 break;
-
-        Ver o funcionamento desde erro depois
-        */
-
         case ASSINATURA_RETORNO_ERROR:
             printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO DO RETORNO DA ASSINATURA DIFERENTE DO TIPO EM FUNC!\n\n", linha);
             system("PAUSE");
@@ -225,6 +216,8 @@ else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_
 contagem_parametros=0;
 }
 
+
+//Colocar erro em semparam?? Verificar a gramática com Felipe.
 void tipos_p_opc() {
 
     if (Token.cat == PR && Token.tipo.codigo == SEMPARAM) {
@@ -232,7 +225,8 @@ void tipos_p_opc() {
 		proximo_Token();
     } else {
         if (tipo()) {
-        	strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema); 
+        	//strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema); 
+			adicionar_Tipos_Param(posicao_parametros , Token.tipo.lexema, assinatura_atual.id);
 			posicao_parametros++;
 			contagem_parametros++;
         	
@@ -254,8 +248,9 @@ void tipos_p_opc() {
 						
                         proximo_Token();
                         
-                        strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema); 
-					    posicao_parametros++;
+                        //strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema); 
+					    adicionar_Tipos_Param(posicao_parametros , Token.tipo.lexema, assinatura_atual.id);
+						posicao_parametros++;
 					    contagem_parametros++;
 
                         if (Token.cat == ID) {
