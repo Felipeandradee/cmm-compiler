@@ -6,6 +6,8 @@ estrutura_fp assinatura_atual; //Assinatura das funções e procedimentos, utiliza
 int posicao_parametros=0; //Variavel que indica a posição atual do parametro na assinatura da função
 int contagem_parametros=0; //Variavel que indica a quantidade de parametros de uma assinatura de uma função ou procedimento
 
+int proc_=0, func_=0; //Variaveis que indica se é procedimento ou função, para da erro semântico no retorno.
+
 //Analisar a condição dessas variaveis, são utilizadas na analise semântica e na tabela de simbolos
 int  posicao_fixa=0;
 int  posicao_atual=0;
@@ -113,6 +115,21 @@ void modulo_erros(Erro tipo_erro) {
             printf("\n\nERRO SEMANTICO NA LINHA %d, TIPOS INCOMPATIVEIS!\n\n", linha);
             system("PAUSE");
             break;
+            
+        case RETURN_PROC_ERRO:
+			printf("\n\nERRO SEMANTICO NA LINHA %d, RETURN EM PROC NAO PODE TER (EXPR)!\n\n", linha);
+            system("PAUSE"); 			 
+			break;
+			 
+		case RETURN_FUNC_ERRO:
+			printf("\n\nERRO SEMANTICO NA LINHA %d, FUNC NAO PODE TER RETURN PURO!\n\n", linha);
+            system("PAUSE"); 			      
+			break;	
+			 
+		case RETURN_EXPR_ERRO:
+			printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO EM RETURN DIFERENTE DO TIPO EM FUNC!\n\n", linha);
+            system("PAUSE");			 	
+			break;  
     }
 }
 
@@ -244,14 +261,11 @@ void tipos_p_opc() {
                     proximo_Token();
 
                     if (tipo()) {
-
-						
-                        proximo_Token();
-                        
-                        //strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema); 
 					    adicionar_Tipos_Param(posicao_parametros , Token.tipo.lexema, assinatura_atual.id);
 						posicao_parametros++;
 					    contagem_parametros++;
+							
+                        proximo_Token();
 
                         if (Token.cat == ID) {
                             pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
@@ -426,11 +440,22 @@ void cmd() {
             case RETORNE:   //Ver a quest?o do permitir por cadeia vazia e fazer a quest?o do ponto e virgula
                 proximo_Token();
 
-                expr();
+                if(expr()){
+                	if(proc_)
+						modulo_erros((Erro)RETURN_PROC_ERRO);
+                }else {
+					if(func_) 
+						modulo_erros((Erro)RETURN_FUNC_ERRO);
+				}
+				
+				verificar_retorno_expr(nome_func, tipo_retorno);
 
                 if (!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA))
                     modulo_erros((Erro) PONTO_VIRGULA_ERRO);
-
+				
+				func_=0;
+				proc_=0;
+				
                 enquanto_for_comando = 1;
                 proximo_Token();
                 break;
@@ -740,8 +765,10 @@ void prog() {
 			
         } else if (tipo() || eh_semretorno) {
             proximo_Token();
-
+			
             if (Token.cat == ID) {
+            	
+            	strcpy(nome_func, Token.tipo.lexema);
 
                 if (TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE) {
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO);
@@ -802,6 +829,11 @@ void prog() {
                                     modulo_erros((Erro) ID_ERRO);
                                 }
                             }
+                            
+                            if(eh_semretorno)
+								proc_ = 1;
+							else
+								func_ = 1;	
 
                             enquanto_for_comando = 1;
                             while (enquanto_for_comando) {

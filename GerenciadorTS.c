@@ -166,6 +166,20 @@ void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[]
 
 }
 
+void verificar_retorno_expr(char nome_funcao[], char tipo_retorno_expr[]) //Verifica se o tipo de retorno da função é o mesmo da expressão
+{
+	int x;
+   
+    for(x = topo_pilha - 1; x >= base_pilha; x--)
+	{
+	     if(!strcmp(tabela_Simbolos[x].id, nome_funcao))	
+         {
+         	//if(strcmp(tabela_Simbolos[x].tipoVariavel,tipo_retorno_expr) != 0 ) modulo_erros((Erro)RETURN_EXPR_ERRO);        	
+		 }	
+	} 
+
+}
+
 void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametros[][8],int sinal, int num_parametros){
     //Sinal: 1 para indicar função, 0 para indicar procedimento (ou é o contrário)
     int posicao_assinaturas, posicao_param_func, achou_id=0, x;

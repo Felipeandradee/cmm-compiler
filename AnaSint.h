@@ -13,7 +13,7 @@ typedef
        FATOR_ERRO, TERMO_ERRO, EXPR_SIMP_ERRO, EXPR_ERRO, ATRIBUICAO_ERRO, VIRGULA_ERRO, PONTO_VIRGULA_ERRO,
        //erros semânticos
        ASSINATURA_RETORNO_ERROR, QUANTIDADE_ARGUMENTOS_ERROR, ARGUMENTO_INVALIDO_ERROR, ID_NAO_ENCONTRADO_ERROR,
-       TIPO_INCOMPATIVEL_ERRO
+       TIPO_INCOMPATIVEL_ERRO, RETURN_PROC_ERRO, RETURN_FUNC_ERRO, RETURN_EXPR_ERRO
    }
 Erro;
 
@@ -28,7 +28,7 @@ typedef
    } estrutura_fp;
 
 //Variaveis utilizadas para a comparação de tipos na analise semântica.
-char tipo_dado_1[15],tipo_dado_2[15], tipo_dado[15], tipo_retorno[15];
+char tipo_dado_1[15],tipo_dado_2[15], tipo_dado[15], tipo_retorno[15], tipo_retorno_func[15], nome_func[15];
 
 void verificar_consistencia_tipos(char tipo1[], char tipo2[]);
 
