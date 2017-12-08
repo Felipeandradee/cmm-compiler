@@ -299,7 +299,8 @@ posicao_parametros=0;
 
 void cmd() {
     Boolean enquanto_for_virgula = TRUE;
-    char id_[15];
+    char id_[15], id_declaracao[15];
+    
 
     if (Token.cat == ID && TNext.cat == SN && TNext.tipo.codigo == ATRIBUICAO) {
         atrib();
@@ -439,7 +440,8 @@ void cmd() {
                 //retorne
             case RETORNE:   //Ver a quest?o do permitir por cadeia vazia e fazer a quest?o do ponto e virgula
                 proximo_Token();
-
+				strcpy(id_declaracao, Token.tipo.lexema);  //Está copiando o id, para depois achar o tipo de retorno.
+				
                 if(expr()){
                 	if(proc_)
 						modulo_erros((Erro)RETURN_PROC_ERRO);
@@ -448,7 +450,7 @@ void cmd() {
 						modulo_erros((Erro)RETURN_FUNC_ERRO);
 				}
 				
-				verificar_retorno_expr(nome_func, tipo_retorno);
+				verificar_retorno_expr(nome_func, tipo_retorno, id_declaracao);
 
                 if (!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA))
                     modulo_erros((Erro) PONTO_VIRGULA_ERRO);
