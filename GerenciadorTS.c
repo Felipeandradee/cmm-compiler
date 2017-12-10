@@ -4,6 +4,20 @@
 int base_pilha = 0;
 int topo_pilha = 0;
 
+char pTipo[5][20] = {
+        {""},
+        {"VARIAVEL"},
+        {"FUNCAO"},
+        {"FUNCAO_PROTOTIPO"},
+        {"PARAMETRO"}
+};
+
+
+char pEscopo[2][20] = {
+        {"GLOBAL"},
+        {"LOCAL"}
+};
+
 void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] ,Escopo escopo_, TipoSimbolo tipo_) {
     strcpy(tabela_Simbolos[topo_pilha].id, id_);
     strcpy(tabela_Simbolos[topo_pilha].tipoVariavel, tipoDaVariavel);
@@ -23,19 +37,28 @@ void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo t
                 continue;
 
             listar_Tabela_Simbolos();
-            if (escopo_recebido == LOCAL) {
 
-                printf("\nERRO LINHA %d VARIAVEL %s REDECLARADA EM ESCOPO LOCAL\n\n", linha, tabela_Simbolos[x].id);
-                system("PAUSE");
-            } else {
-                printf("\nERRO LINHA %d VARIAVEL %s REDECLARADA EM ESCOPO GLOBAL\n\n", linha, tabela_Simbolos[x].id);
-                system("PAUSE");
-
-            }
+            printf("\nERRO LINHA %d %s %s REDECLARADA EM ESCOPO %s\n\n", linha, pTipo[tipo_], tabela_Simbolos[x].id, pEscopo[escopo_recebido]);
+            system("PAUSE");
 
         }
 
     }
+
+}
+
+void declarado_na_tabela_simbolos(char id_[]) {
+    int x;
+
+    for (x = topo_pilha - 1; x >= base_pilha; x--) {
+        if (!strcmp(tabela_Simbolos[x].id, id_)) {
+            return;
+
+        }
+
+    }
+    printf("\nERRO LINHA %d, %s NAO DECLARADA.\n\n", linha, id_);
+    system("PAUSE");
 
 }
 
@@ -183,9 +206,9 @@ void verificar_retorno_expr(char nome_funcao[], char tipo_retorno_expr[], char i
 	{
 	     if(!strcmp(tabela_Simbolos[x].id, nome_funcao))	
          {
-         	if(strcmp(tabela_Simbolos[x].tipoVariavel,tipo_retorno_expr) != 0 ) modulo_erros((Erro)RETURN_EXPR_ERRO);        	
+         	if(strcmp(tabela_Simbolos[x].tipoVariavel,tipo_retorno_expr) != 0 ) modulo_erros((Erro)RETURN_EXPR_ERRO);
 		 }	
-	} 
+	}
 
 }
 
@@ -199,7 +222,7 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
         for(x = topo_pilha - 1; x >= base_pilha; x--) {
 
             //Verifica se possui o mesmo id da assinatura
-            if(!strcmp(tabela_Simbolos[x].id, id_recebido) /*&& !strcmp(tabela_Simbolos[x].cat, "fwd_func")*/){ //verificar esta validação com Felipe
+            if(!strcmp(tabela_Simbolos[x].id, id_recebido) && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO){ //verificar esta validação com Felipe
                 achou_id=1;
 				
                 //Tipo recebido não pode ser int (Lucas)
@@ -235,7 +258,6 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
 
         }
 
-        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
     }
     else if(sinal == 0){
 

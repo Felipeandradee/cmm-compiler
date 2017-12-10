@@ -163,7 +163,8 @@ Boolean tipo() {
 void atrib() {
 	
 	if (Token.cat == ID) {
-	result = pesquisar_Tipo(Token.tipo.lexema, tipo_id, VARIAVEL);
+        declarado_na_tabela_simbolos(Token.tipo.lexema);
+        result = pesquisar_Tipo(Token.tipo.lexema, tipo_id, VARIAVEL);
 		
 		proximo_Token();
 
@@ -507,6 +508,8 @@ void cmd() {
                 }else {
 					if(func_) 
 						modulo_erros((Erro)RETURN_FUNC_ERRO);
+                    else strcpy(tipo_retorno, "");
+
 				}
 				
 				verificar_retorno_expr(nome_func, tipo_retorno, id_declaracao);
@@ -589,12 +592,15 @@ Boolean expr() {
         //Analise semântica: Consistência de tipos na atribuição.
         if(result == 1)
         	strcpy(tipo_dado_2,"inteiro");
-        if(result == 2)
+        else if(result == 2)
         	strcpy(tipo_dado_2,"caracter");
-        if(result == 3)
-        	strcpy(tipo_dado_2,"real");	
-        
-		verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
+        else if(result == 3)
+        	strcpy(tipo_dado_2,"real");
+        else
+            strcpy(tipo_dado_2,"");
+
+
+        verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
 		
         if (op_rel()) {
             proximo_Token();
@@ -620,6 +626,8 @@ Boolean fator() {
     //FATOR IDS
     if (Token.cat == ID) {
         strcpy(id_, Token.tipo.lexema);
+
+        declarado_na_tabela_simbolos(id_);
 
         proximo_Token();
 
@@ -769,7 +777,8 @@ void prog() {
         Boolean eh_semretorno = FALSE;
 
         if (Token.cat == PR && Token.tipo.codigo == SEMRETORNO) {
-            eh_semretorno = TRUE; 
+            eh_semretorno = TRUE;
+            strcpy(tipo_id, "");
             tipo_proc = 1;     //Saber se é procedimento ou função.
         }else {
         	tipo_proc = 0;
@@ -781,6 +790,7 @@ void prog() {
 
             if (Token.cat == PR && Token.tipo.codigo == SEMRETORNO) {
                 eh_semretorno = TRUE;
+                strcpy(tipo_id, "");
             }
 
             if (tipo() || eh_semretorno) {
@@ -1011,7 +1021,9 @@ void prog() {
             //GERA CÓDIGO
 	        fprintf(arquivo_gerador, "DMEM %d\n", num_var); 
 	        num_var=0;
-	        
+            adicionar_qtd_param(contagem_parametros, nome_func);
+            contagem_parametros=0;
+
         }
         
     //GERA CÓDIGO (Verificar se este gerar codigo está correto)
@@ -1065,6 +1077,11 @@ void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
 					  if(strcmp(tipo2,"real") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
 					  strcpy(tipo_retorno, "real");
 				  break;
+
+                  default:
+                      if(strcmp(tipo2,"") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
+                        strcpy(tipo_retorno, "");
+                      break;
 
 			   }
 
