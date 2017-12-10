@@ -39,5 +39,22 @@ Boolean expr_simp();
 Boolean termo();
 void prog();
 
+//Geração de código
+FILE	*arquivo_gerador;
+
+char 	nome_label[8], label_num_s[50], label_letra[40];
+
+
+void	gera_Label(char []);
+void    gera_codigo_Maior_Igual();
+void    gera_codigo_Menor_Igual();
+void    gera_codigo_Maior();
+void    gera_codigo_Menor();
+void    gera_codigo_Diferente();
+void    gera_codigo_Igualdade();
+
+void	abrir_Arquivo_Gerador();
+void    fechar_Arquivo_Gerador();
+
 #endif // SINTATICO_H_INCLUDED
 

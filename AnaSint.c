@@ -13,6 +13,11 @@ int  posicao_fixa=0;
 int  posicao_atual=0;
 int result;
 
+//Variaveis usadas para geração de código.
+int label = 0, num_label;
+int num_var = 0; //Contagem de número de variaveis usadas ao logo do programa
+int tipo_relacional;
+
 void proximo_Token() {
     Token = TNext;
     if (Token.cat != END)
@@ -233,7 +238,6 @@ else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_
 contagem_parametros=0;
 }
 
-
 //Colocar erro em semparam?? Verificar a gramática com Felipe.
 void tipos_p_opc() {
 
@@ -299,7 +303,8 @@ posicao_parametros=0;
 
 void cmd() {
     Boolean enquanto_for_virgula = TRUE;
-    char id_[15], id_declaracao[15];
+    char id_[15], id_declaracao[15];  //Analise semântica
+    char controle_fluxo[8]; //geração de códugo.
     
 
     if (Token.cat == ID && TNext.cat == SN && TNext.tipo.codigo == ATRIBUICAO) {
@@ -369,12 +374,25 @@ void cmd() {
                         modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                 } else
                     modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
+                
+                //GERA CÓDIGO
+				strcpy(controle_fluxo, "GOFALSE ");
+	            gera_Label(controle_fluxo);	
 
                 cmd();
 
                 if (Token.cat == PR && Token.tipo.codigo == SENAO) {
+                	//GERA CÓDIGO
+					strcpy(controle_fluxo, "GOTO ");
+	                gera_Label(controle_fluxo);  
+					strcpy(nome_label, "LABEL ");
+	                gera_Label(nome_label);
+                	
                     proximo_Token();
                     cmd();
+                    
+                    strcpy(nome_label, "LABEL ");
+	                gera_Label(nome_label);
                 }
 
                 enquanto_for_comando = 1;
@@ -387,6 +405,10 @@ void cmd() {
 
                 if (Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE) {
                     proximo_Token();
+                    
+                    //GERA CÓDIGO
+					strcpy(nome_label, "LABEL ");
+	                gera_Label(nome_label);
 
                     if (!expr())
                         modulo_erros((Erro) EXPR_ERRO);
@@ -399,9 +421,19 @@ void cmd() {
 
                 } else
                     modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
+                    
+                //GERA CÓDIGO
+				strcpy(controle_fluxo, "GOFALSE ");
+	            gera_Label(controle_fluxo);	
 
                 cmd();
-
+				
+				//GERA CÓDIGO
+				strcpy(controle_fluxo, "GOTO ");
+	            gera_Label(controle_fluxo);	                                        
+	            strcpy(nome_label, "LABEL ");
+	            gera_Label(nome_label);
+	                                        
                 enquanto_for_comando = 1;
                 break;
 
@@ -412,14 +444,30 @@ void cmd() {
                 if (Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE) {
                     proximo_Token();
                     atrib();
-
+					
+					//GERA CÓDIGO
+					strcpy(nome_label, "LABEL ");
+	                gera_Label(nome_label);
+	                                               
                     if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) {
                         proximo_Token();
                         expr();
+                        
+                        //GERA CÓDIGO
+						strcpy(controle_fluxo, "GOTO ");
+	                    gera_Label(controle_fluxo);
+						strcpy(nome_label, "LABEL ");
+	                    gera_Label(nome_label);
 
                         if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) {
                             proximo_Token();
                             atrib();
+                            
+                            //GERA CÓDIGO
+							strcpy(controle_fluxo, "GOTO ");
+	                        gera_Label(controle_fluxo);
+	                        strcpy(nome_label, "LABEL ");
+	                        gera_Label(nome_label);
 
                             //Verifica se fechou o parentese
                             if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE)
@@ -432,8 +480,19 @@ void cmd() {
                         modulo_erros((Erro) VIRGULA_ERRO);
                 } else
                     modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
+                    
+                //GERA CÓDIGO
+				strcpy(controle_fluxo, "GOFALSE ");
+	            gera_Label(controle_fluxo);
 
                 cmd();
+                
+                //GERA CÓDIGO
+				strcpy(controle_fluxo, "GOTO ");
+	            gera_Label(controle_fluxo);
+				strcpy(nome_label, "LABEL ");
+	            gera_Label(nome_label);
+                
                 enquanto_for_comando = 1;
                 break;
 
@@ -451,6 +510,8 @@ void cmd() {
 				}
 				
 				verificar_retorno_expr(nome_func, tipo_retorno, id_declaracao);
+				
+				fprintf(arquivo_gerador,"RET %d,%d\n", 1,1);
 
                 if (!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA))
                     modulo_erros((Erro) PONTO_VIRGULA_ERRO);
@@ -465,6 +526,12 @@ void cmd() {
             case ABRE_CHAVES:
                 proximo_Token();
                 cmd();
+                
+                 //GERA CÓDIGO (Verificar se este gerar código está correto)
+				strcpy(controle_fluxo, "GOTO ");
+	            gera_Label(controle_fluxo);
+				strcpy(nome_label, "LABEL ");
+	            gera_Label(nome_label);
 
                 if (!(Token.cat == SN && Token.tipo.codigo == FECHA_CHAVES)) {
                     modulo_erros((Erro) FECHAMENTO_CHAVES_ERRO);
@@ -533,7 +600,10 @@ Boolean expr() {
             proximo_Token();
             if (!expr_simp())
                 modulo_erros((Erro) EXPR_SIMP_ERRO);
-
+			
+			//Gera código dependendo do operador relacional
+			gerador_Codigo_Expr(tipo_relacional);
+			   
             strcpy(tipo_dado_2,tipo_dado);
             verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
         }
@@ -555,8 +625,11 @@ Boolean fator() {
 
         if (Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE) {
 
-            strcpy(id_func, Token.tipo.lexema);
-
+            strcpy(id_func, Token.tipo.lexema);  //Verificar isto aqui.
+			
+			//GERA CÓDIGO PARA CHAMADA DE FUNÇÃO
+            pesquisar_nome_func(id_func);   //Verificar esta função.
+                       
             proximo_Token();
 
             if (expr()) {
@@ -574,6 +647,7 @@ Boolean fator() {
                 proximo_Token();
             else
                 modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
+                
             return TRUE;
 
         }
@@ -609,6 +683,9 @@ Boolean fator() {
 
         //FATOR intcon
     else if (Token.cat == CT_I) {
+		//GERA CÓDIGO		
+		fprintf(arquivo_gerador,"PUSH %d\n", 0);  //Alterar para colocar o vaor do token
+		
 		proximo_Token();
 
         strcpy(tipo_dado, "inteiro"); //Copia para comparação de tipos na analise semântica
@@ -617,7 +694,10 @@ Boolean fator() {
 
         //FATOR realcon
     else if (Token.cat == CT_R) {
-        proximo_Token();
+        //GERA CÓDIGO		
+		fprintf(arquivo_gerador,"PUSH %s\n", Token.tipo.lexema);
+		   
+		proximo_Token();
 
         strcpy(tipo_dado, "real");
         return TRUE;
@@ -645,26 +725,32 @@ Boolean fator() {
 Boolean op_rel() {
 
     if (Token.cat == SN && Token.tipo.codigo == IGUAL) {
-        return TRUE;
+        tipo_relacional = 5; //Saber o tipo relacional para gerar código.
+		return TRUE;
     }
 
     if (Token.cat == SN && Token.tipo.codigo == DIFERENTE) {
+    	tipo_relacional = 6;
         return TRUE;
     }
 
     if (Token.cat == SN && Token.tipo.codigo == MENORIGUAL) {
+    	tipo_relacional = 2;
         return TRUE;
     }
 
     if (Token.cat == SN && Token.tipo.codigo == MAIORIGUAL) {
+    	tipo_relacional = 1;	
         return TRUE;
     }
 
     if (Token.cat == SN && Token.tipo.codigo == MENOR) {
+    	tipo_relacional = 4;
         return TRUE;
     }
 
     if (Token.cat == SN && Token.tipo.codigo == MAIOR) {
+    	tipo_relacional = 3;
         return TRUE;
     }
 
@@ -672,8 +758,13 @@ Boolean op_rel() {
 }
 
 void prog() {
-    while (Token.cat != END) {
-
+    int num_var_prog;
+    
+	while (Token.cat != END) {
+		
+		//GERA CÓDIGO
+	    fprintf(arquivo_gerador, "INIP\n");  //Inicio do programa
+		
         proximo_Token();
         Boolean eh_semretorno = FALSE;
 
@@ -771,6 +862,17 @@ void prog() {
             if (Token.cat == ID) {
             	
             	strcpy(nome_func, Token.tipo.lexema);
+            	
+            	//GERA CÓDIGO								 
+				strcpy(nome_label, "LABEL ");
+				label++;
+	            num_label=label;
+				sprintf(label_num_s, "%i", num_label);
+	            strcpy(label_letra, "L");
+	            strcat(label_letra, label_num_s);
+				strcat(nome_label, label_letra);
+				strcat(nome_label, "\n");									 
+				fprintf(arquivo_gerador,nome_label);
 
                 if (TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE) {
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO);
@@ -778,6 +880,7 @@ void prog() {
                 } else {
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
                     adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
+                    num_var++;
                 }
 				
 				strcpy(assinatura_atual.id,Token.tipo.lexema);
@@ -792,21 +895,24 @@ void prog() {
 
                     tipos_param();
 
+
                     if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE) {
                         proximo_Token();
-
+						
                         if (Token.cat == SN && Token.tipo.codigo == ABRE_CHAVES) {
                             proximo_Token();
+                            
+                            //GERA CÓDIGO (inicio de função)
+							fprintf(arquivo_gerador, "INIPR\n");
 
                             while (tipo()) {
 
                                 proximo_Token();
 
                                 if (Token.cat == ID) {
-                                    pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL,
-                                                              VARIAVEL);
-                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL,
-                                                              VARIAVEL);
+                                    pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
+                                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, VARIAVEL);
+                                	num_var++;
 
                                     proximo_Token();
 
@@ -817,7 +923,9 @@ void prog() {
                                         if (Token.cat == ID) {
                                             pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
                                             adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, VARIAVEL);
-                                            proximo_Token();
+                                            num_var++;
+                                            
+											proximo_Token();
                                         } else {
                                             modulo_erros((Erro) ID_ERRO);
                                         }
@@ -831,6 +939,9 @@ void prog() {
                                     modulo_erros((Erro) ID_ERRO);
                                 }
                             }
+                            
+                            //GERA CÓDIGO (Final de função ou procedimento)
+	                        fprintf(arquivo_gerador, "AMEM %d\n", num_var);
                             
                             if(eh_semretorno)
 								proc_ = 1;
@@ -854,8 +965,8 @@ void prog() {
                     }
                 } else if (eh_semretorno) {
                     modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
-                } else if (Token.tipo.codigo == VIRGULA) {
-                    while (Token.tipo.codigo == VIRGULA) {
+                } else if (Token.tipo.codigo == VIRGULA) {   //Declaração de variavel
+                  	while (Token.tipo.codigo == VIRGULA) {
                         proximo_Token();
                         pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
                         adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
@@ -865,14 +976,26 @@ void prog() {
                         }
                         proximo_Token();
 
-                        if ((Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) ||
-                            (Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
-                            if ((Token.cat == ID) || (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) ||
+                        if ((Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) || (Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
+                        	if ((Token.cat == ID) || (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) ||
                                 (Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
                                 proximo_Token();
                             } else {
                                 modulo_erros((Erro) ID_ERRO);
                             }
+                        
+                        	//GERA CÓDIGO
+	                     	fprintf(arquivo_gerador, "AMEM %d\n", num_var);
+	                     	label++;
+	                     	num_label=label;	                     
+	                     	sprintf(label_num_s, "%i", num_label);
+	                     	strcpy(label_letra, "L");
+	                     	strcat(label_letra, label_num_s);
+	                     	fprintf(arquivo_gerador, "GO TO %s\n", label_letra);
+	                     	num_var_prog = num_var;
+						 			     
+						 	num_var=0;
+                        
                         } else
                             modulo_erros((Erro) PONTO_VIRGULA_ERRO);
                     }
@@ -884,8 +1007,20 @@ void prog() {
             } else {
                 modulo_erros((Erro) ID_ERRO);
             }
+            
+            //GERA CÓDIGO
+	        fprintf(arquivo_gerador, "DMEM %d\n", num_var); 
+	        num_var=0;
+	        
         }
+        
+    //GERA CÓDIGO (Verificar se este gerar codigo está correto)
+	fprintf(arquivo_gerador, "DMEM %d\n",  num_var_prog);
+	fprintf(arquivo_gerador, "HALT\n");
+	
     }
+
+fechar_Arquivo_Gerador();					    
 }
 
 //Erros semânticos
@@ -935,3 +1070,197 @@ void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
 
 }
 
+//Geração de código
+void gera_codigo_Maior_Igual()
+{
+	char controle_fluxo[8];
+	
+	fprintf(arquivo_gerador,"SUB\n");
+	fprintf(arquivo_gerador,"COPY\n");
+	strcpy(controle_fluxo, "GOTRUE "); 
+	gera_Label(controle_fluxo);
+	strcpy(controle_fluxo, "GOFALSE ");
+	gera_Label(controle_fluxo);	  	  
+	fprintf(arquivo_gerador,"PUSH %d\n", 0);
+	strcpy(controle_fluxo, "GOTO ");
+	gera_Label(controle_fluxo);	   
+	strcpy(nome_label, "LABEL ");
+	gera_Label(nome_label);	  
+	fprintf(arquivo_gerador,"POP\n");
+	strcpy(nome_label, "LABEL ");
+	gera_Label(nome_label);	  
+	fprintf(arquivo_gerador,"PUSH %d\n", 1);
+	strcpy(nome_label, "LABEL ");
+	gera_Label(nome_label);	
+}
+
+void gera_codigo_Menor_Igual()
+{
+   char controle_fluxo[8];
+  
+   fprintf(arquivo_gerador,"SUB\n");
+   strcpy(controle_fluxo, "GOTRUE "); 
+   gera_Label(controle_fluxo); 
+   fprintf(arquivo_gerador,"PUSH %d\n", 1);
+   strcpy(controle_fluxo, "GOTO ");
+   gera_Label(controle_fluxo);	   
+   strcpy(nome_label, "LABEL ");
+   gera_Label(nome_label);
+   fprintf(arquivo_gerador,"PUSH %d\n", 0);
+   strcpy(nome_label, "LABEL ");
+   gera_Label(nome_label);		
+}
+
+void gera_codigo_Maior()
+{
+  char controle_fluxo[8];
+  
+  fprintf(arquivo_gerador,"SUB\n");
+  strcpy(controle_fluxo, "GOTRUE "); 
+  gera_Label(controle_fluxo);
+  fprintf(arquivo_gerador,"PUSH %d\n", 0);
+  strcpy(controle_fluxo, "GOTO ");
+  gera_Label(controle_fluxo);
+  strcpy(nome_label, "LABEL ");
+  gera_Label(nome_label);
+  fprintf(arquivo_gerador,"PUSH %d\n", 1);
+  strcpy(nome_label, "LABEL ");
+  gera_Label(nome_label);
+}
+
+void gera_codigo_Menor()
+{
+    char controle_fluxo[8];
+
+	fprintf(arquivo_gerador,"SUB\n");
+	fprintf(arquivo_gerador,"COPY\n");
+	strcpy(controle_fluxo, "GOTRUE "); 
+	gera_Label(controle_fluxo);
+	strcpy(controle_fluxo, "GOFALSE ");
+	gera_Label(controle_fluxo);	 
+	fprintf(arquivo_gerador,"PUSH %d\n", 1);
+	strcpy(controle_fluxo, "GOTO ");
+	gera_Label(controle_fluxo);	
+	strcpy(nome_label, "LABEL ");
+	gera_Label(nome_label);	
+	fprintf(arquivo_gerador,"POP\n");
+	strcpy(nome_label, "LABEL ");
+	gera_Label(nome_label);
+	fprintf(arquivo_gerador,"PUSH %d\n", 0);
+	strcpy(nome_label, "LABEL ");
+	gera_Label(nome_label);
+
+}
+
+void gera_codigo_Diferente()
+{
+   char controle_fluxo[8];
+ 
+   fprintf(arquivo_gerador,"SUB\n");
+   strcpy(controle_fluxo, "GOFALSE ");
+   gera_Label(controle_fluxo);
+   fprintf(arquivo_gerador,"PUSH %d\n", 1);
+   strcpy(controle_fluxo, "GOTO ");
+   gera_Label(controle_fluxo);
+   strcpy(nome_label, "LABEL ");
+   gera_Label(nome_label);  
+   fprintf(arquivo_gerador,"PUSH %d\n", 0);
+   strcpy(nome_label, "LABEL ");
+   gera_Label(nome_label);	
+}
+
+void gera_codigo_Igualdade()
+{
+   char controle_fluxo[8];
+   
+   fprintf(arquivo_gerador,"SUB\n");
+   strcpy(controle_fluxo, "GOFALSE ");
+   gera_Label(controle_fluxo);
+   fprintf(arquivo_gerador,"PUSH %d\n", 0);
+   strcpy(controle_fluxo, "GOTO ");
+   gera_Label(controle_fluxo);
+   strcpy(nome_label, "LABEL ");
+   gera_Label(nome_label);
+   fprintf(arquivo_gerador,"PUSH %d\n", 1);
+   strcpy(nome_label, "LABEL ");
+   gera_Label(nome_label);	
+}
+
+void gera_Label(char controle_fluxo[])
+{
+	label++;
+	num_label=label;
+    sprintf(label_num_s, "%i", num_label);
+	strcpy(label_letra, "L");
+	strcat(label_letra, label_num_s);
+	strcat(controle_fluxo, label_letra);
+	strcat(controle_fluxo, "\n");	   
+	
+	fprintf(arquivo_gerador,controle_fluxo);	
+}
+
+void gerador_Codigo_Expr(int condicao)
+{
+	  
+	     switch(condicao)
+	     {
+	     	//MAIOR OU IGUAL
+			case 1:
+	     	     //GERA CÓDIGO		
+	             gera_codigo_Maior_Igual();	     	
+	     	break;
+	     	
+	     	//MENOR OU IGUAL
+			case 2:
+	     	     //GERA CÓDIGO
+	             gera_codigo_Menor_Igual();	     	
+	     	break;
+	     	
+	     	
+			//MAIOR
+			case 3:
+	     	    //GERA CÓDIGO 
+	            gera_codigo_Maior();	     	
+	     	break;
+	     	
+			 			 	     	
+			//MENOR
+	     	case 4:
+	     		 //GERA CÓDIGO  
+	             gera_codigo_Menor();	     		
+	     	break;	
+	     		     	
+	     	//IGUALDADE
+	     	case 5:	     		
+				 //GERA CÓDIGO
+	             gera_codigo_Igualdade();	     		
+	        break;		
+	     	
+	        
+	        //DIFERENTE
+	     	case 6:
+	     		//GERA CÓDIGO
+	            gera_codigo_Diferente();	     		
+	     	break;	
+	     	
+	     	
+		 }
+		
+}
+
+void  abrir_Arquivo_Gerador()
+{
+    if((arquivo_gerador = fopen("codigo_objeto.obj","w"))==NULL)
+      {
+          printf("ERRO AO ABRIR O ARQUIVO!!!\n");
+          system("PAUSE");
+      }
+		
+	
+}
+
+void fechar_Arquivo_Gerador()
+{
+	fclose(arquivo_gerador);
+
+}

@@ -39,6 +39,7 @@ struct {
     Boolean zumbi;
     int  qtd_param;
     char parametros[20][8];
+    char label[8];  //Geração de código.
 }
 tabela;
 
@@ -70,6 +71,12 @@ void verificar_retorno_expr(char nome_funcao[], char tipo_retorno_expr[], char i
 void excluir_Tabela_Simbolos();
 
 void listar_Tabela_Simbolos();
+
+//Geração de código.
+
+void adicionar_label_Tabela(char [], char []);
+
+void pesquisar_nome_func(char []);
 
 #endif // GERENCIADOR_H_INCLUDED
 

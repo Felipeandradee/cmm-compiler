@@ -4,8 +4,6 @@
 int base_pilha = 0;
 int topo_pilha = 0;
 
-
-
 void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] ,Escopo escopo_, TipoSimbolo tipo_) {
     strcpy(tabela_Simbolos[topo_pilha].id, id_);
     strcpy(tabela_Simbolos[topo_pilha].tipoVariavel, tipoDaVariavel);
@@ -269,4 +267,34 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
 
 }
 
+//Geração de codigo.
 
+void adicionar_label_Tabela(char id_[], char novo_label[])
+{
+    int x;
+   
+    for(x = topo_pilha - 1; x >= base_pilha; x--)
+	{
+	    if(!strcmp(tabela_Simbolos[x].id, id_)) 
+			strcpy(tabela_Simbolos[x].label, novo_label);
+    }
+		
+}
+
+//GERA CÓDIGO PARA CHAMADA DE FUNÇÃO
+void pesquisar_nome_func(char id_[])
+{
+    int x;
+   
+    for(x = topo_pilha - 1; x >= base_pilha; x--)
+	{
+		if(!strcmp(tabela_Simbolos[x].id, id_))
+		{
+		   //GERA CÓDIGO
+		   //fprintf(arquivo_gerador,"LDA %d,%d\n", tabela_Simbolos[x].escopo,tabela_Simbolos[x].deslocamento);     	
+		   fprintf(arquivo_gerador,"CALL %s\n", tabela_Simbolos[x].label);	
+		}
+				
+	}
+	  		
+}
