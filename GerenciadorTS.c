@@ -289,6 +289,30 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
 
 }
 
+void verificar_param_func(char nome_funcao[], int num_parametros, char parametros[][8]){
+    int x, posicao_param_func;
+
+        for(x = topo_pilha - 1; x >= base_pilha; x--)
+        {
+            if(!strcmp(tabela_Simbolos[x].id, nome_funcao))
+            {
+                if(tabela_Simbolos[x].qtd_param != num_parametros)
+                    modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
+                else {
+
+                    for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
+                    {
+                        if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
+                            modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
+                    }
+
+                }
+            }
+        }
+}
+
+
+
 //Geração de codigo.
 
 void adicionar_label_Tabela(char id_[], char novo_label[])

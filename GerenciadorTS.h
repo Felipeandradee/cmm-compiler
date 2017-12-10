@@ -70,6 +70,8 @@ void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[]
 
 void verificar_retorno_expr(char nome_funcao[], char tipo_retorno_expr[], char id_[]);
 
+void verificar_param_func(char nome_funcao[], int num_parametros, char parametros[][8]);
+
 void excluir_Tabela_Simbolos();
 
 void listar_Tabela_Simbolos();

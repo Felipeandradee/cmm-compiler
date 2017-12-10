@@ -248,7 +248,7 @@ void tipos_p_opc() {
     } else {
         if (tipo()) {
         	//strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema); 
-			adicionar_Tipos_Param(posicao_parametros , Token.tipo.lexema, assinatura_atual.id);
+			adicionar_Tipos_Param(posicao_parametros, tipo_id, assinatura_atual.id);
 			posicao_parametros++;
 			contagem_parametros++;
         	
@@ -266,7 +266,7 @@ void tipos_p_opc() {
                     proximo_Token();
 
                     if (tipo()) {
-					    adicionar_Tipos_Param(posicao_parametros , Token.tipo.lexema, assinatura_atual.id);
+					    adicionar_Tipos_Param(posicao_parametros, tipo_id, assinatura_atual.id);
 						posicao_parametros++;
 					    contagem_parametros++;
 							
@@ -633,27 +633,36 @@ Boolean fator() {
         proximo_Token();
 
         if (Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE) {
+            char params[20][8];
+            int count_param = 0;
 
-            strcpy(id_func, Token.tipo.lexema);  //Verificar isto aqui.
-			
 			//GERA CÓDIGO PARA CHAMADA DE FUNÇÃO
-            pesquisar_nome_func(id_func);   //Verificar esta função.
+            pesquisar_nome_func(id_);   //Verificar esta função.
                        
             proximo_Token();
 
             if (expr()) {
+                strcpy(params[count_param], tipo_dado);
+                count_param++;
+
                 while (Token.cat == SN && Token.tipo.codigo == VIRGULA) {
                     proximo_Token();
 
                     if (!expr())
                         modulo_erros((Erro) EXPRESSAO_ERRO);
 
+                    strcpy(params[count_param], tipo_dado);
+                    count_param++;
+
                 }
             }
 
 
-            if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE)
+            if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE) {
+                verificar_param_func(id_, count_param, params);
                 proximo_Token();
+
+            }
             else
                 modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                 
