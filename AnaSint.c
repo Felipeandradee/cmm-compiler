@@ -317,6 +317,7 @@ void cmd() {
         enquanto_for_comando = 1;
 
     } else if (Token.cat == ID) {
+        declarado_na_tabela_simbolos(Token.tipo.lexema);
         proximo_Token();
 
         if (Token.cat == SN && Token.tipo.codigo == ABRE_PARENTESE) {
