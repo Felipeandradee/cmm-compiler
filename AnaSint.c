@@ -554,15 +554,33 @@ void cmd() {
 }
 
 Boolean termo() {
-    if (fator()) {
+    int mult, div;
+	
+	if (fator()) {
+		
+		if(Token.cat == SN && Token.tipo.codigo == MULTIPLICACAO){
+    		mult = TRUE;
+    		div = FALSE;
+    	}
+    	
+    	if(Token.cat == SN && Token.tipo.codigo == DIVISAO){
+    		div = TRUE;
+    		mult = FALSE;
+    	}
+		
         while ((Token.cat == SN && Token.tipo.codigo == MULTIPLICACAO) ||
                (Token.cat == SN && Token.tipo.codigo == DIVISAO) || (Token.cat == SN && Token.tipo.codigo == AND)) {
             proximo_Token();
 
-            if (fator())
-                proximo_Token();
-            else
+            if (!fator())
                 modulo_erros((Erro) FATOR_ERRO);
+            
+            //GERA CÓDIGO	 //Instrução aritimetica simples	
+			if(mult)
+				fprintf(arquivo_gerador,"MULT\n");
+			
+			if(div)
+				fprintf(arquivo_gerador,"DIV\n");
         }
         return TRUE;
     }
@@ -570,16 +588,36 @@ Boolean termo() {
 }
 
 Boolean expr_simp() {
-    if ((Token.cat == SN && Token.tipo.codigo == SOMA) || (Token.cat == SN && Token.tipo.codigo == SUBTRACAO))
+    int add, sub; //Variaveis usadas para indicar se é soma ou subtração.
+	
+	if ((Token.cat == SN && Token.tipo.codigo == SOMA) || (Token.cat == SN && Token.tipo.codigo == SUBTRACAO))
         proximo_Token();
 
     if (termo()) {
+		
+		if(Token.cat == SN && Token.tipo.codigo == SOMA){
+    		add = TRUE;
+    		sub = FALSE;
+    	}
+    	
+    	if(Token.cat == SN && Token.tipo.codigo == SUBTRACAO){
+    		sub = TRUE;
+    		add = FALSE;
+    	}
+		
         while ((Token.cat == SN && Token.tipo.codigo == SOMA) || (Token.cat == SN && Token.tipo.codigo == SUBTRACAO) ||
                Token.cat == SN && Token.tipo.codigo == OR) {
             proximo_Token();
 
             if (!termo())
                 modulo_erros((Erro) TERMO_ERRO);
+			
+			//GERA CÓDIGO	 //Instrução aritimetica simples	
+			if(add)
+				fprintf(arquivo_gerador,"ADD\n");
+			
+			if(sub)
+				fprintf(arquivo_gerador,"SUB\n");
         }
         return TRUE;
     }
@@ -702,7 +740,7 @@ Boolean fator() {
         //FATOR intcon
     else if (Token.cat == CT_I) {
 		//GERA CÓDIGO		
-		fprintf(arquivo_gerador,"PUSH %d\n", 0);  //Alterar para colocar o vaor do token
+		fprintf(arquivo_gerador,"PUSH %d\n", Token.tipo.valor_int); 
 		
 		proximo_Token();
 
@@ -713,7 +751,7 @@ Boolean fator() {
         //FATOR realcon
     else if (Token.cat == CT_R) {
         //GERA CÓDIGO		
-		fprintf(arquivo_gerador,"PUSH %s\n", Token.tipo.lexema);
+		fprintf(arquivo_gerador,"PUSH %s\n", Token.tipo.valor_real);
 		   
 		proximo_Token();
 
@@ -777,11 +815,11 @@ Boolean op_rel() {
 
 void prog() {
     int num_var_prog;
+	
+	//GERA CÓDIGO
+	fprintf(arquivo_gerador, "INIP\n");  //Inicio do programa
     
 	while (Token.cat != END) {
-		
-		//GERA CÓDIGO
-	    fprintf(arquivo_gerador, "INIP\n");  //Inicio do programa
 		
         proximo_Token();
         Boolean eh_semretorno = FALSE;
@@ -883,18 +921,18 @@ void prog() {
             	
             	strcpy(nome_func, Token.tipo.lexema);
             	
-            	//GERA CÓDIGO								 
-				strcpy(nome_label, "LABEL ");
-				label++;
-	            num_label=label;
-				sprintf(label_num_s, "%i", num_label);
-	            strcpy(label_letra, "L");
-	            strcat(label_letra, label_num_s);
-				strcat(nome_label, label_letra);
-				strcat(nome_label, "\n");									 
-				fprintf(arquivo_gerador,nome_label);
-
                 if (TNext.cat == SN && TNext.tipo.codigo == ABRE_PARENTESE) {
+					//GERA CÓDIGO								 
+					strcpy(nome_label, "LABEL ");
+					label++;
+					num_label=label;
+					sprintf(label_num_s, "%i", num_label);
+					strcpy(label_letra, "L");
+					strcat(label_letra, label_num_s);
+					strcat(nome_label, label_letra);
+					strcat(nome_label, "\n");									 
+					fprintf(arquivo_gerador,nome_label);
+				
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, FUNCAO);
                     adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, FUNCAO);
                 } else {
@@ -960,7 +998,7 @@ void prog() {
                                 }
                             }
                             
-                            //GERA CÓDIGO (Final de função ou procedimento)
+                            //GERA CÓDIGO
 	                        fprintf(arquivo_gerador, "AMEM %d\n", num_var);
                             
                             if(eh_semretorno)
@@ -977,7 +1015,12 @@ void prog() {
                                 modulo_erros((Erro) FECHAMENTO_CHAVES_ERRO);
                             } else
                                 excluir_Tabela_Simbolos();
-                        } else {
+						
+						//GERA CÓDIGO
+	       				fprintf(arquivo_gerador, "DMEM %d\n", num_var);    //Utilizado para representar as variaveis locais.
+	        			num_var=0;
+						
+						} else {
                             modulo_erros((Erro) ABERTURA_CHAVES_ERRO);
                         }
                     } else {
@@ -990,57 +1033,56 @@ void prog() {
                         proximo_Token();
                         pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
                         adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
-
+						num_var++;
+						
                         if (Token.cat != ID) {
                             modulo_erros((Erro) ID_ERRO);
                         }
                         proximo_Token();
 
-                        if ((Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) || (Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
-                        	if ((Token.cat == ID) || (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) ||
-                                (Token.cat == SN && Token.tipo.codigo == VIRGULA)) {
-                                proximo_Token();
-                            } else {
-                                modulo_erros((Erro) ID_ERRO);
-                            }
+                        if (!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) && !(Token.cat == SN && Token.tipo.codigo == VIRGULA))
+                        	modulo_erros((Erro) PONTO_VIRGULA_ERRO);                            
                         
-                        	//GERA CÓDIGO
-	                     	fprintf(arquivo_gerador, "AMEM %d\n", num_var);
-	                     	label++;
-	                     	num_label=label;	                     
-	                     	sprintf(label_num_s, "%i", num_label);
-	                     	strcpy(label_letra, "L");
-	                     	strcat(label_letra, label_num_s);
-	                     	fprintf(arquivo_gerador, "GO TO %s\n", label_letra);
-	                     	num_var_prog = num_var;
+						//GERA CÓDIGO
+	                    if(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA){
+							fprintf(arquivo_gerador, "AMEM %d\n", num_var);
+	                   		label++;
+	                    	num_label=label;	                     
+	                    	sprintf(label_num_s, "%i", num_label);
+	                    	strcpy(label_letra, "L");
+	                    	strcat(label_letra, label_num_s);
+	                    	fprintf(arquivo_gerador, "GO TO %s\n", label_letra);
+	                    	num_var_prog = num_var;
 						 			     
-						 	num_var=0;
-                        
-                        } else
-                            modulo_erros((Erro) PONTO_VIRGULA_ERRO);
+							num_var=0;
+						}
                     }
-                    pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
-                    adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
                 } else if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA) {
+					
+					//GERA CÓDIGO (Quando a declaração é uma unica variavel)
+					fprintf(arquivo_gerador, "AMEM %d\n", num_var);
+	                label++;
+	                num_label=label;	                     
+	                sprintf(label_num_s, "%i", num_label);
+	                strcpy(label_letra, "L");
+	                strcat(label_letra, label_num_s);
+	                fprintf(arquivo_gerador, "GO TO %s\n", label_letra);
+	                num_var_prog = num_var;
+						 			     
+					num_var=0;
                 } else
                     modulo_erros((Erro) PONTO_VIRGULA_ERRO);
             } else {
                 modulo_erros((Erro) ID_ERRO);
             }
-            
-            //GERA CÓDIGO
-	        fprintf(arquivo_gerador, "DMEM %d\n", num_var); 
-	        num_var=0;
             adicionar_qtd_param(contagem_parametros, nome_func);
             contagem_parametros=0;
-
         }
-        
-    //GERA CÓDIGO (Verificar se este gerar codigo está correto)
-	fprintf(arquivo_gerador, "DMEM %d\n",  num_var_prog);
-	fprintf(arquivo_gerador, "HALT\n");
-	
     }
+	
+//GERA CÓDIGO (Verificar se este gerar codigo está correto)
+fprintf(arquivo_gerador, "DMEM %d\n",  num_var_prog);
+fprintf(arquivo_gerador, "HALT\n");
 
 fechar_Arquivo_Gerador();					    
 }
