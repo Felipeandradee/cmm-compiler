@@ -170,8 +170,7 @@ void atrib() {
 
         if (Token.cat == SN && Token.tipo.codigo == ATRIBUICAO) {
             proximo_Token();
-
-            
+        
 			if (!expr())
                 modulo_erros((Erro) EXPR_ERRO);
 
@@ -382,6 +381,9 @@ void cmd() {
 	            gera_Label(controle_fluxo);	
 
                 cmd();
+                
+                strcpy(nome_label, "LABEL ");
+	            gera_Label(nome_label);
 
                 if (Token.cat == PR && Token.tipo.codigo == SENAO) {
                 	//GERA CÓDIGO
@@ -456,6 +458,10 @@ void cmd() {
                         expr();
                         
                         //GERA CÓDIGO
+						strcpy(controle_fluxo, "GOFALSE ");
+	           			gera_Label(controle_fluxo);
+                        
+                        //GERA CÓDIGO
 						strcpy(controle_fluxo, "GOTO ");
 	                    gera_Label(controle_fluxo);
 						strcpy(nome_label, "LABEL ");
@@ -482,10 +488,6 @@ void cmd() {
                         modulo_erros((Erro) VIRGULA_ERRO);
                 } else
                     modulo_erros((Erro) ABERTURA_PARENTESE_ERRO);
-                    
-                //GERA CÓDIGO
-				strcpy(controle_fluxo, "GOFALSE ");
-	            gera_Label(controle_fluxo);
 
                 cmd();
                 
@@ -695,7 +697,6 @@ Boolean fator() {
                 }
             }
 
-
             if (Token.cat == SN && Token.tipo.codigo == FECHA_PARENTESE) {
                 verificar_param_func(id_, count_param, params);
                 proximo_Token();
@@ -704,11 +705,19 @@ Boolean fator() {
             else
                 modulo_erros((Erro) FECHAMENTO_PARENTESE_ERRO);
                 
-            return TRUE;
-
-        }
-
         return TRUE;
+        }
+    
+	 //GERA CÓDIGO								 
+	strcpy(nome_label, "LOAD ");				
+	sprintf(label_num_s, "%s", id_);
+	strcpy(label_letra, label_num_s);
+	strcat(nome_label, "1, ");
+	strcat(nome_label, label_letra);
+	strcat(nome_label, "\n");	             
+	fprintf(arquivo_gerador,nome_label);
+				 	
+    return TRUE;
     }
 
         //FATOR (expr)
@@ -1093,50 +1102,40 @@ fechar_Arquivo_Gerador();
 //Compara a assinatura da função e procedimento com suas devidas definições
 
 void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
-  int tipo_dado;
+	int tipo_dado;
 
-  if(!strcmp(tipo1, "inteiro"))  tipo_dado=1;
-  if(!strcmp(tipo1, "caracter")) tipo_dado=2;
-  if(!strcmp(tipo1, "real")) tipo_dado=3;
+	if(!strcmp(tipo1, "inteiro"))  tipo_dado=1;
+	if(!strcmp(tipo1, "caracter")) tipo_dado=2;
+	if(!strcmp(tipo1, "real")) tipo_dado=3;
 
-
-				switch(tipo_dado)
-                {
-
-				  //INT
-                  case 1:
-
-				      if(strcmp(tipo2,"inteiro") != 0)
-			          {
-						 if(strcmp(tipo2,"caracter") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
-
-					  }
-				      strcpy(tipo_retorno, "inteiro");
-				  break;
-
-			      //CHAR
-				  case 2:
-
-				      if(strcmp(tipo2,"caracter") != 0)
-			          {
-						 if(strcmp(tipo2,"inteiro") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
-					  }
-					  strcpy(tipo_retorno, "caracter");
-				  break;
-
-				  //REAL
-				  case 3:
-					  if(strcmp(tipo2,"real") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
-					  strcpy(tipo_retorno, "real");
-				  break;
-
-                  default:
-                      if(strcmp(tipo2,"") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
-                        strcpy(tipo_retorno, "");
-                      break;
-
-			   }
-
+	switch(tipo_dado){
+	//INT
+		case 1:
+			if(strcmp(tipo2,"inteiro") != 0){
+				if(strcmp(tipo2,"caracter") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
+			}
+			strcpy(tipo_retorno, "inteiro");
+		break;
+			
+	//CHAR
+		case 2:
+			if(strcmp(tipo2,"caracter") != 0){
+				if(strcmp(tipo2,"inteiro") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
+			}
+			strcpy(tipo_retorno, "caracter");
+		break;
+			
+	//REAL
+		case 3:
+			if(strcmp(tipo2,"real") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
+			strcpy(tipo_retorno, "real");
+		break;
+			
+		default:
+			if(strcmp(tipo2,"") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
+					strcpy(tipo_retorno, "");
+				break;
+	}
 }
 
 //Geração de código
