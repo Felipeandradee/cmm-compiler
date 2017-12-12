@@ -173,6 +173,8 @@ void atrib() {
         
 			if (!expr())
                 modulo_erros((Erro) EXPR_ERRO);
+            
+            fprintf(arquivo_gerador,"STOR %d,%d\n",1,deslocamento_recebido);
 
         } else modulo_erros((Erro) ATRIBUICAO_ERRO);
     }
@@ -196,6 +198,7 @@ void tipos_param() {
             if (Token.cat == ID) {
                 pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, PARAMETRO);
                 adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, PARAMETRO);
+                
 
                 proximo_Token();
 
@@ -674,11 +677,12 @@ Boolean fator() {
     Boolean enquanto_for_virgula = TRUE;
     char id_[50], id_func[50];
 	char controle_fluxo[8]; //geração de códugo.
-	
+	int enderecoRelativo5, local, global;
+		
     //FATOR IDS
     if (Token.cat == ID) {
         strcpy(id_, Token.tipo.lexema);
-
+		
         declarado_na_tabela_simbolos(id_);
 
         proximo_Token();
@@ -718,16 +722,29 @@ Boolean fator() {
                 
         return TRUE;
         }
+        
+    enderecoRelativo5 = retorna_endereco_relativo(id_);
     
-	 //GERA CÓDIGO								 
-	strcpy(nome_label, "LOAD ");				
-	sprintf(label_num_s, "%s", id_);
-	strcpy(label_letra, label_num_s);
-	strcat(nome_label, "1, ");
-	strcat(nome_label, label_letra);
-	strcat(nome_label, "\n");	             
-	fprintf(arquivo_gerador,nome_label);
-				 	
+    if(retorna_escopo(id_) == GLOBAL){
+		 //GERA CÓDIGO								 
+		strcpy(nome_label, "LOAD ");				
+		sprintf(label_num_s, "%d", enderecoRelativo5);
+		strcpy(label_letra, label_num_s);
+		strcat(nome_label, "0, ");
+		strcat(nome_label, label_letra);
+		strcat(nome_label, "\n");	             
+		fprintf(arquivo_gerador,nome_label);
+	}else {
+	//GERA CÓDIGO								 
+		strcpy(nome_label, "LOAD ");				
+		sprintf(label_num_s, "%d", enderecoRelativo5);
+		strcpy(label_letra, label_num_s);
+		strcat(nome_label, "1, ");
+		strcat(nome_label, label_letra);
+		strcat(nome_label, "\n");	             
+		fprintf(arquivo_gerador,nome_label);
+	}
+    		 	
     return TRUE;
     }
 
@@ -845,6 +862,8 @@ Boolean op_rel() {
 }
 
 void prog() {
+	abrir_Arquivo_Gerador();
+	
     int num_var_prog;
 	
 	//GERA CÓDIGO
@@ -969,6 +988,7 @@ void prog() {
                 } else {
                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
                     adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
+                    addEnderecoRelativo(Token.tipo.lexema, GLOBAL, VARIAVEL);
                     num_var++;
                 }
 				
@@ -1001,6 +1021,7 @@ void prog() {
                                 if (Token.cat == ID) {
                                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
                                     adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, VARIAVEL);
+                                     addEnderecoRelativo(Token.tipo.lexema, LOCAL, VARIAVEL);
                                 	num_var++;
 
                                     proximo_Token();
@@ -1012,7 +1033,8 @@ void prog() {
                                         if (Token.cat == ID) {
                                             pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
                                             adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, VARIAVEL);
-                                            num_var++;
+                                            addEnderecoRelativo(Token.tipo.lexema, LOCAL, VARIAVEL);
+											num_var++;
                                             
 											proximo_Token();
                                         } else {
@@ -1064,6 +1086,7 @@ void prog() {
                         proximo_Token();
                         pesquisar_Tabela_Simbolos(Token.tipo.lexema, GLOBAL, VARIAVEL);
                         adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, GLOBAL, VARIAVEL);
+                        addEnderecoRelativo(Token.tipo.lexema, GLOBAL, VARIAVEL);
 						num_var++;
 						
                         if (Token.cat != ID) {
@@ -1132,6 +1155,7 @@ void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
 
 	switch(tipo_dado){
 	//INT
+	
 		case 1:
 			if(strcmp(tipo2,"inteiro") != 0){
 				if(strcmp(tipo2,"caracter") != 0) modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);
@@ -1156,6 +1180,7 @@ void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
 		default:
 			if(strcmp(tipo2,"") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
 					strcpy(tipo_retorno, "");
+					
 				break;
 	}
 }
@@ -1340,17 +1365,15 @@ void gerador_Codigo_Expr(int condicao)
 
 void  abrir_Arquivo_Gerador()
 {
-    if((arquivo_gerador = fopen("codigo_objeto.obj","w"))==NULL)
-      {
-          printf("ERRO AO ABRIR O ARQUIVO!!!\n");
-          system("PAUSE");
-      }
-		
+    arquivo_gerador = fopen("codigo_objeto.obj","w");
+    if(arquivo_gerador == NULL)
+			printf("Erro, nao foi possivel abrir o arquivo\n");
 	
 }
 
 void fechar_Arquivo_Gerador()
 {
+
 	fclose(arquivo_gerador);
 
 }

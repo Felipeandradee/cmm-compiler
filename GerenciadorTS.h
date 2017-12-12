@@ -40,6 +40,7 @@ struct {
     int  qtd_param;
     char parametros[20][8];
     char label[8];  //Geração de código.
+    int enderecoRelativo;   //Saber qual é o endereco que a variavel foi alocada na memoria para maquina de pilha
 }
 tabela;
 
@@ -77,6 +78,11 @@ void excluir_Tabela_Simbolos();
 void listar_Tabela_Simbolos();
 
 //Geração de código.
+void addEnderecoRelativo(char id_[], Escopo escopo_, TipoSimbolo tipo_);
+
+int retorna_endereco_relativo(char id_[]);
+
+int retorna_escopo(char id_[]);
 
 void adicionar_label_Tabela(char [], char []);
 

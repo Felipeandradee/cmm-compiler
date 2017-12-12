@@ -3,6 +3,8 @@
 
 int base_pilha = 0;
 int topo_pilha = 0;
+int enderecoRelativo2 = 0;
+int enderecoRelativo3 = 0;
 
 char pTipo[5][20] = {
         {""},
@@ -26,6 +28,48 @@ void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] ,Escopo escopo_
     tabela_Simbolos[topo_pilha].zumbi = FALSE;
     topo_pilha++;
 }
+
+void addEnderecoRelativo(char id_[], Escopo escopo_, TipoSimbolo tipo_){
+	int x;
+	
+	for (x = topo_pilha - 1; x >= base_pilha; x--) {
+        if (!strcmp(tabela_Simbolos[x].id, id_)){
+        	
+        	if(escopo_ == LOCAL && tipo_ == VARIAVEL){
+				tabela_Simbolos[x].enderecoRelativo = enderecoRelativo2;
+				enderecoRelativo2++;
+			}	
+	
+			if(escopo_ == GLOBAL && tipo_ == VARIAVEL){
+				tabela_Simbolos[x].enderecoRelativo = enderecoRelativo3;
+				enderecoRelativo3++;
+			}
+
+		}
+    }
+}
+
+int retorna_endereco_relativo(char id_[]) {
+    int x;
+    
+	for (x = topo_pilha - 1; x >= base_pilha; x--) {
+        if (!strcmp(tabela_Simbolos[x].id, id_)){
+			return tabela_Simbolos[x].enderecoRelativo;
+		}
+    }
+}
+
+int retorna_escopo(char id_[]) {
+    int x;
+    
+	for (x = topo_pilha - 1; x >= base_pilha; x--) {
+        if (!strcmp(tabela_Simbolos[x].id, id_)){
+			return tabela_Simbolos[x].escopo;
+		}
+    }
+}
+
+
 
 void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo tipo_) {
     int x;
