@@ -306,7 +306,6 @@ void cmd() {
     char id_[15], id_declaracao[15];  //Analise semântica
     char controle_fluxo[8]; //geração de códugo.
     
-
     if (Token.cat == ID && TNext.cat == SN && TNext.tipo.codigo == ATRIBUICAO) {
         atrib();
         if (Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA)
@@ -354,9 +353,6 @@ void cmd() {
         enquanto_for_comando = 1;
 
     } else {
-
-//        if(TNext.cat == SN && TNext.tipo.codigo == ATRIBUICAO)
-//            proximo_Token();
 
         switch (Token.tipo.codigo) {
             //Se
@@ -591,6 +587,7 @@ Boolean termo() {
 
 Boolean expr_simp() {
     int add, sub; //Variaveis usadas para indicar se é soma ou subtração.
+	char controle_fluxo[8];
 	
 	if ((Token.cat == SN && Token.tipo.codigo == SOMA) || (Token.cat == SN && Token.tipo.codigo == SUBTRACAO))
         proximo_Token();
@@ -609,7 +606,19 @@ Boolean expr_simp() {
 		
         while ((Token.cat == SN && Token.tipo.codigo == SOMA) || (Token.cat == SN && Token.tipo.codigo == SUBTRACAO) ||
                Token.cat == SN && Token.tipo.codigo == OR) {
-            proximo_Token();
+            
+            if(Token.cat == SN && Token.tipo.codigo == OR){
+            	//Gera Código (Ver como vai ficar  questão do label no final) 
+				fprintf(arquivo_gerador,"COPY\n");
+   				strcpy(controle_fluxo, "GOTRUE "); 
+   				gera_Label(controle_fluxo); 
+   				fprintf(arquivo_gerador,"POP\n");
+   				
+   				add = FALSE;
+   				sub = FALSE;
+			}
+			
+			proximo_Token();
 
             if (!termo())
                 modulo_erros((Erro) TERMO_ERRO);
@@ -620,6 +629,7 @@ Boolean expr_simp() {
 			
 			if(sub)
 				fprintf(arquivo_gerador,"SUB\n");
+				
         }
         return TRUE;
     }
@@ -663,7 +673,8 @@ Boolean fator() {
 
     Boolean enquanto_for_virgula = TRUE;
     char id_[50], id_func[50];
-
+	char controle_fluxo[8]; //geração de códugo.
+	
     //FATOR IDS
     if (Token.cat == ID) {
         strcpy(id_, Token.tipo.lexema);
@@ -737,12 +748,23 @@ Boolean fator() {
 
         //FATOR "!" nega??o fator
     else if (Token.cat == SN && Token.tipo.codigo == NOT) {
-        proximo_Token();
-        if (fator())
-            proximo_Token();
-        else
+		
+		proximo_Token();
+        if (!fator())
             modulo_erros((Erro) FATOR_ERRO);
-
+            
+        //Gera Código
+		strcpy(controle_fluxo, "GOFALSE ");
+		gera_Label(controle_fluxo);	  	  
+		fprintf(arquivo_gerador,"PUSH %d\n", 0);
+		strcpy(controle_fluxo, "GOTO ");
+		gera_Label(controle_fluxo);	   
+		strcpy(nome_label, "LABEL ");
+		gera_Label(nome_label);	  
+		fprintf(arquivo_gerador,"PUSH %d\n", 1);
+		strcpy(nome_label, "LABEL ");
+		gera_Label(nome_label);	  
+		
         return TRUE;
     }
 
@@ -1202,9 +1224,9 @@ void gera_codigo_Menor()
 
 	fprintf(arquivo_gerador,"SUB\n");
 	fprintf(arquivo_gerador,"COPY\n");
-	strcpy(controle_fluxo, "GOTRUE "); 
+	strcpy(controle_fluxo, "GOFALSE "); 
 	gera_Label(controle_fluxo);
-	strcpy(controle_fluxo, "GOFALSE ");
+	strcpy(controle_fluxo, "GOTRUE ");
 	gera_Label(controle_fluxo);	 
 	fprintf(arquivo_gerador,"PUSH %d\n", 1);
 	strcpy(controle_fluxo, "GOTO ");
