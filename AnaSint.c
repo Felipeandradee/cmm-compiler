@@ -161,6 +161,10 @@ Boolean tipo() {
 }
 
 void atrib() {
+	char id_[50];
+	int enderecoRelativo5;
+	
+	strcpy(id_, Token.tipo.lexema);
 	
 	if (Token.cat == ID) {
         declarado_na_tabela_simbolos(Token.tipo.lexema);
@@ -174,7 +178,12 @@ void atrib() {
 			if (!expr())
                 modulo_erros((Erro) EXPR_ERRO);
             
-            fprintf(arquivo_gerador,"STOR %d,%d\n",1,deslocamento_recebido);
+            enderecoRelativo5 = retorna_endereco_relativo(id_);
+            if(retorna_escopo(id_) == GLOBAL){
+				fprintf(arquivo_gerador,"STOR %d,%d\n",0,enderecoRelativo5);
+			}else {
+				fprintf(arquivo_gerador,"STOR %d,%d\n",1,enderecoRelativo5);
+			}
 
         } else modulo_erros((Erro) ATRIBUICAO_ERRO);
     }
