@@ -418,7 +418,8 @@ void analexico() {
                     lexema[cont] = ch;
                     cont++;
                 } else{
-                    error_lexico();
+                    montaToken(SN, "/", '\0', DIVISAO);
+                    return;
                 }
                 break;
             }
