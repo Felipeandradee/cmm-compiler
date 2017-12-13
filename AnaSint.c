@@ -565,6 +565,7 @@ void cmd() {
 
 Boolean termo() {
     int mult, div;
+    char controle_fluxo[8];
 	
 	if (fator()) {
 		
@@ -572,7 +573,6 @@ Boolean termo() {
     		mult = TRUE;
     		div = FALSE;
     	}
-    	
     	if(Token.cat == SN && Token.tipo.codigo == DIVISAO){
     		div = TRUE;
     		mult = FALSE;
@@ -580,17 +580,40 @@ Boolean termo() {
 		
         while ((Token.cat == SN && Token.tipo.codigo == MULTIPLICACAO) ||
                (Token.cat == SN && Token.tipo.codigo == DIVISAO) || (Token.cat == SN && Token.tipo.codigo == AND)) {
-            proximo_Token();
+           
+		   if(Token.cat == SN && Token.tipo.codigo == AND){
+            	//Gera Código (Ver como vai ficar  questão do label no final) 
+				fprintf(arquivo_gerador,"COPY\n");
+   				strcpy(controle_fluxo, "GOFALSE "); 
+   				gera_Label(controle_fluxo); 
+   				fprintf(arquivo_gerador,"POP\n");
+   				
+   				mult = FALSE;
+   				div = FALSE;
+			}
+           
+		    proximo_Token();
 
             if (!fator())
                 modulo_erros((Erro) FATOR_ERRO);
             
             //GERA CÓDIGO	 //Instrução aritimetica simples	
-			if(mult)
-				fprintf(arquivo_gerador,"MULT\n");
+			if(mult){
+				if(!strcmp(tipo_dado, "real")){
+					fprintf(arquivo_gerador,"MULTF\n");
+				}else{
+					fprintf(arquivo_gerador,"MULT\n");
+				}
+			}
 			
-			if(div)
-				fprintf(arquivo_gerador,"DIV\n");
+			if(div){
+				if(!strcmp(tipo_dado, "real")){
+					fprintf(arquivo_gerador,"DIVF\n");
+				}else {
+					fprintf(arquivo_gerador,"DIV\n");
+				}
+			}	
+				
         }
         return TRUE;
     }
@@ -636,12 +659,23 @@ Boolean expr_simp() {
                 modulo_erros((Erro) TERMO_ERRO);
 			
 			//GERA CÓDIGO	 //Instrução aritimetica simples	
-			if(add)
-				fprintf(arquivo_gerador,"ADD\n");
+			if(add){
+				if(!strcmp(tipo_dado, "real")){
+					fprintf(arquivo_gerador,"ADDF\n");
+				}
+				else{
+					fprintf(arquivo_gerador,"ADD\n");
+				}
+			}
 			
-			if(sub)
-				fprintf(arquivo_gerador,"SUB\n");
-				
+			if(sub){
+				if(!strcmp(tipo_dado, "real")){
+					fprintf(arquivo_gerador,"SUBF\n");
+				}else{
+					fprintf(arquivo_gerador,"SUB\n");
+				}
+			}
+					
         }
         return TRUE;
     }
@@ -808,7 +842,7 @@ Boolean fator() {
         //FATOR realcon
     else if (Token.cat == CT_R) {
         //GERA CÓDIGO		
-		fprintf(arquivo_gerador,"PUSH %s\n", Token.tipo.valor_real);
+		fprintf(arquivo_gerador,"PUSH %g\n", Token.tipo.valor_real);
 		   
 		proximo_Token();
 
