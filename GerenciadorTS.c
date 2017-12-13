@@ -106,16 +106,17 @@ void declarado_na_tabela_simbolos(char id_[]) {
 
 }
 
-int pesquisar_Tipo(char id_[],char tipoDaVariavel[], TipoSimbolo tipo_) {
+int pesquisar_Tipo(char id_[], TipoSimbolo tipo_) {
     int caracter, inteiro, real;
     
 	int x;
 
     for (x = topo_pilha - 1; x >= base_pilha; x--) {
-        if (!strcmp(tabela_Simbolos[x].id, id_) && tabela_Simbolos[x].zumbi == FALSE
-            && tabela_Simbolos[x].tipo != PARAMETRO) {
-            if (tipo_ == FUNCAO && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO)
+        if (!strcmp(tabela_Simbolos[x].id, id_) /*&& tabela_Simbolos[x].zumbi == FALSE
+            && tabela_Simbolos[x].tipo != PARAMETRO*/) {
+            /*if (tipo_ == FUNCAO && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO)
                 continue;
+                */
                 
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "inteiro")){
 				inteiro = 1;
@@ -308,7 +309,7 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
         for(x = topo_pilha - 1; x >= base_pilha; x--) {
 
             //Verifica se possui o mesmo id da assinatura
-            if(!strcmp(tabela_Simbolos[x].id, id_recebido) /*&& !strcmp(tabela_Simbolos[x].cat, "fwd_proc")*/){
+            if(!strcmp(tabela_Simbolos[x].id, id_recebido) && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO){
                 achou_id=1;
 
                 //Verifica a quantidade de argumentos de proc em relação a assinatura
@@ -327,7 +328,7 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
             }
         }
 
-        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
+//        if(!achou_id) modulo_erros((Erro)ID_NAO_ENCONTRADO_ERROR);
 
     }
 

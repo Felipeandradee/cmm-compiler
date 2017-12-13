@@ -57,7 +57,7 @@ void pesquisar_Tabela_Simbolos(char id_[], Escopo escopo_recebido, TipoSimbolo t
 
 void declarado_na_tabela_simbolos(char id_[]);
 
-int pesquisar_Tipo(char id_[],char tipoDaVariavel[], TipoSimbolo tipo_);
+int pesquisar_Tipo(char id_[], TipoSimbolo tipo_);
 
 void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametros[][8],int sinal, int num_parametros);
 

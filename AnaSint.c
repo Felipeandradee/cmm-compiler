@@ -168,7 +168,7 @@ void atrib() {
 	
 	if (Token.cat == ID) {
         declarado_na_tabela_simbolos(Token.tipo.lexema);
-        result = pesquisar_Tipo(Token.tipo.lexema, tipo_id, VARIAVEL);
+        result = pesquisar_Tipo(Token.tipo.lexema, VARIAVEL);
 		
 		proximo_Token();
 
@@ -193,12 +193,12 @@ void tipos_param() {
     Boolean enquanto_for_virgula = TRUE;
 
     if (Token.cat == PR && Token.tipo.codigo == SEMPARAM) {
-        strcpy(assinatura_atual.parametros[0],Token.tipo.lexema); //Coloando o nome do parametro na estrutura
+        strcpy(assinatura_atual.parametros[0],""); //Coloando o nome do parametro na estrutura
         proximo_Token();
 
     } else {
         if (tipo()) {
-            strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema);
+            strcpy(assinatura_atual.parametros[posicao_parametros],tipo_id);
             posicao_parametros++;
             contagem_parametros++;
 
@@ -216,7 +216,7 @@ void tipos_param() {
                         proximo_Token();
 
                         if (tipo()) {
-                            strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema);
+                            strcpy(assinatura_atual.parametros[posicao_parametros],tipo_id);
                             posicao_parametros++;
                             contagem_parametros++;
 
@@ -246,7 +246,7 @@ posicao_parametros=0;
 
 if(!tipo_proc) pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,1,contagem_parametros);
 else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,0,contagem_parametros);}
-
+adicionar_qtd_param(contagem_parametros, assinatura_atual.id);
 contagem_parametros=0;
 }
 
@@ -301,7 +301,8 @@ void tipos_p_opc() {
             else if (tipo())
                 modulo_erros((Erro) VIRGULA_ERRO);
                 
-        //adicionar_qtd_param(contagem_parametros, assinatura_atual.id);        
+            adicionar_qtd_param(contagem_parametros, assinatura_atual.id);
+            contagem_parametros=0;
         } else {
             modulo_erros((Erro) TIPO_ERRO);
         }
@@ -310,7 +311,6 @@ posicao_parametros=0;
 //if(!tipo_proc) pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,1,contagem_parametros);
 //else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,0,contagem_parametros);}
 
-//contagem_parametros=0;
 }
 
 void cmd() {
@@ -340,7 +340,7 @@ void cmd() {
 
                         if (expr()) {
                             enquanto_for_virgula = TRUE;
-                            proximo_Token();
+//                            proximo_Token();
                         } else
                             modulo_erros((Erro) EXPRESSAO_ERRO);
                     } else
@@ -411,7 +411,6 @@ void cmd() {
                 break;
 
 
-                //enquanto
             case ENQUANTO:
                 proximo_Token();
 
@@ -539,8 +538,11 @@ void cmd() {
 
             case ABRE_CHAVES:
                 proximo_Token();
-                cmd();
-                
+
+                while(enquanto_for_comando) {
+                    cmd();
+                }
+
                  //GERA CÓDIGO (Verificar se este gerar código está correto)
 				strcpy(controle_fluxo, "GOTO ");
 	            gera_Label(controle_fluxo);
@@ -684,7 +686,7 @@ Boolean expr_simp() {
 
 Boolean expr() {
     if (expr_simp()) {
-        strcpy(tipo_dado_1,tipo_dado);
+            strcpy(tipo_dado_1,tipo_dado);
         
         //Analise semântica: Consistência de tipos na atribuição.
         if(result == 1)
@@ -696,8 +698,8 @@ Boolean expr() {
         else
             strcpy(tipo_dado_2,"");
 
-
-        verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
+        if(strcmp(tipo_dado_1, ""))
+            verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
 		
         if (op_rel()) {
             proximo_Token();
@@ -707,7 +709,7 @@ Boolean expr() {
 			//Gera código dependendo do operador relacional
 			gerador_Codigo_Expr(tipo_relacional);
 			   
-            strcpy(tipo_dado_2,tipo_dado);
+            strcpy(tipo_dado_1,tipo_dado);
             verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
         }
         return TRUE;
@@ -727,6 +729,7 @@ Boolean fator() {
         strcpy(id_, Token.tipo.lexema);
 		
         declarado_na_tabela_simbolos(id_);
+        result = pesquisar_Tipo(Token.tipo.lexema, VARIAVEL);
 
         proximo_Token();
 
@@ -1004,9 +1007,9 @@ void prog() {
                 modulo_erros((Erro) TIPO_ERRO);
             }
             
-            adicionar_qtd_param(contagem_parametros, assinatura_atual.id);
-			contagem_parametros=0; 		
-			
+//            adicionar_qtd_param(contagem_parametros, assinatura_atual.id);
+//			contagem_parametros=0;
+//
         } else if (tipo() || eh_semretorno) {
             proximo_Token();
 			
@@ -1172,8 +1175,8 @@ void prog() {
             } else {
                 modulo_erros((Erro) ID_ERRO);
             }
-            adicionar_qtd_param(contagem_parametros, nome_func);
-            contagem_parametros=0;
+//            adicionar_qtd_param(contagem_parametros, nome_func);
+//            contagem_parametros=0;
         }
     }
 	
