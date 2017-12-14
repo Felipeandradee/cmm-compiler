@@ -31,15 +31,15 @@ void adicionar_Tabela_Simbolos(char id_[], char tipoDaVariavel[] ,Escopo escopo_
 
 void addEnderecoRelativo(char id_[], Escopo escopo_, TipoSimbolo tipo_){
 	int x;
-	
+
 	for (x = topo_pilha - 1; x >= base_pilha; x--) {
         if (!strcmp(tabela_Simbolos[x].id, id_)){
-        	
+
         	if(escopo_ == LOCAL && tipo_ == VARIAVEL){
 				tabela_Simbolos[x].enderecoRelativo = enderecoRelativo2;
 				enderecoRelativo2++;
-			}	
-	
+			}
+
 			if(escopo_ == GLOBAL && tipo_ == VARIAVEL){
 				tabela_Simbolos[x].enderecoRelativo = enderecoRelativo3;
 				enderecoRelativo3++;
@@ -49,9 +49,34 @@ void addEnderecoRelativo(char id_[], Escopo escopo_, TipoSimbolo tipo_){
     }
 }
 
+
+void addEnderecoRelativoParametros(char id_[], Escopo escopo_, TipoSimbolo tipo_, int qtdParam){
+	int x;
+	int posicao_param_func;
+	int EnderecoRelativo7 = -3;
+	char id[50];
+	
+	//LOCAL //PARAMETRO
+	
+	for (x = topo_pilha - 1; x >= base_pilha; x--) {
+        if (!strcmp(tabela_Simbolos[x].id, id_)){	
+        	for(x = topo_pilha - 1; x >= base_pilha; x--){
+    			if((tabela_Simbolos[x].escopo == LOCAL) && (tabela_Simbolos[x].tipo == PARAMETRO)){	
+            		for(x = topo_pilha - 1; x >= base_pilha; x--){
+						if((tabela_Simbolos[x].escopo == LOCAL) && (tabela_Simbolos[x].tipo == PARAMETRO)){
+							tabela_Simbolos[x].enderecoRelativo = EnderecoRelativo7;
+							EnderecoRelativo7--;
+						}
+					}
+				}	
+			}
+		}
+	}
+}
+
 int retorna_endereco_relativo(char id_[]) {
     int x;
-    
+
 	for (x = topo_pilha - 1; x >= base_pilha; x--) {
         if (!strcmp(tabela_Simbolos[x].id, id_)){
 			return tabela_Simbolos[x].enderecoRelativo;
@@ -61,7 +86,7 @@ int retorna_endereco_relativo(char id_[]) {
 
 int retorna_escopo(char id_[]) {
     int x;
-    
+
 	for (x = topo_pilha - 1; x >= base_pilha; x--) {
         if (!strcmp(tabela_Simbolos[x].id, id_)){
 			return tabela_Simbolos[x].escopo;
@@ -108,7 +133,7 @@ void declarado_na_tabela_simbolos(char id_[]) {
 
 int pesquisar_Tipo(char id_[], TipoSimbolo tipo_) {
     int caracter, inteiro, real;
-    
+
 	int x;
 
     for (x = topo_pilha - 1; x >= base_pilha; x--) {
@@ -117,17 +142,17 @@ int pesquisar_Tipo(char id_[], TipoSimbolo tipo_) {
             /*if (tipo_ == FUNCAO && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO)
                 continue;
                 */
-                
+
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "inteiro")){
 				inteiro = 1;
             	return inteiro;
 			}
-            	
+
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "caracter")){
             	caracter = 2;
             	return caracter;
 			}
-            
+
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "real")){
             	real = 3;
             	return real;
@@ -164,19 +189,19 @@ void listar_Tabela_Simbolos() {
 void addParamFunc(char id2[]){
 	char idAux[50];
 	int x, qtd;
-	
+
     for(x = topo_pilha - 1; x >= base_pilha; x--)
     {
         if(!strcmp(tabela_Simbolos[x].id, id2) && tabela_Simbolos[x].qtd_param != 0 )
      	{
      		strcpy(idAux,tabela_Simbolos[x].id);
-			qtd = tabela_Simbolos[x].qtd_param;	
-					
+			qtd = tabela_Simbolos[x].qtd_param;
+
 			for(x = topo_pilha - 1; x >= base_pilha; x--){
 				if(!strcmp(idAux, tabela_Simbolos[x].id) && tabela_Simbolos[x].qtd_param == 0){
-					tabela_Simbolos[x].qtd_param = qtd; 	
+					tabela_Simbolos[x].qtd_param = qtd;
 				}
-			}		
+			}
 		}
 	}
 }
@@ -184,19 +209,19 @@ void addParamFunc(char id2[]){
 void addParamFunc2(char id2[], int posicaoParam){
 	char idAux[50], params[50];
 	int x, qtd;
-	
+
     for(x = topo_pilha - 1; x >= base_pilha; x--)
     {
-        if(!strcmp(tabela_Simbolos[x].id, id2) && strcmp(tabela_Simbolos[x].parametros[posicaoParam], "\000")) 
+        if(!strcmp(tabela_Simbolos[x].id, id2) && strcmp(tabela_Simbolos[x].parametros[posicaoParam], "\000"))
      	{
      		strcpy(idAux,tabela_Simbolos[x].id);
 			strcpy(params,tabela_Simbolos[x].parametros[posicaoParam]);
-					
+
 			for(x = topo_pilha - 1; x >= base_pilha; x--){
 				if(!strcmp(idAux, tabela_Simbolos[x].id) && !strcmp(tabela_Simbolos[x].parametros[posicaoParam], "\000")){
 					strcpy(tabela_Simbolos[x].parametros[posicaoParam],params);
 				}
-			}		
+			}
 		}
 	}
 }
@@ -204,7 +229,7 @@ void addParamFunc2(char id2[], int posicaoParam){
 void adicionar_qtd_param(int qtd, char id_[]) //Guarda a quantidade de  parâmetros na tabela de símbolos
 {
     int x;
-	  
+
      for(x = topo_pilha - 1; x >= base_pilha; x--)
      {
           if(!strcmp(tabela_Simbolos[x].id, id_))
@@ -219,15 +244,15 @@ void adicionar_qtd_param(int qtd, char id_[]) //Guarda a quantidade de  parâmetr
 void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[])
 {
    int x;
-	  
+
      for(x = topo_pilha - 1; x >= base_pilha; x--)
      {
 
           if(!strcmp(tabela_Simbolos[x].id, id_))
      	  {
-             strcpy(tabela_Simbolos[x].parametros[posicao_parametro], tipo_Param); 
+             strcpy(tabela_Simbolos[x].parametros[posicao_parametro], tipo_Param);
 	      }
-	 	 
+
 	 }
 
 }
@@ -235,24 +260,24 @@ void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[]
 void verificar_retorno_expr(char nome_funcao[], char tipo_retorno_expr[], char id_[]) //Verifica se o tipo de retorno da função é o mesmo da expressão
 {
 	int x;
-	
+
 	if(!strcmp(tipo_retorno_expr, "")){     //Caso o retorno seja só uma declaração de variavel.
-		
+
 		for(x = topo_pilha - 1; x >= base_pilha; x--)
 		{
-	     	if(!strcmp(tabela_Simbolos[x].id, id_))	
+	     	if(!strcmp(tabela_Simbolos[x].id, id_))
          	{
-         		strcpy(tipo_retorno_expr, tabela_Simbolos[x].tipoVariavel);        	
-		 	}	
+         		strcpy(tipo_retorno_expr, tabela_Simbolos[x].tipoVariavel);
+		 	}
 		}
 	}
-	
+
     for(x = topo_pilha - 1; x >= base_pilha; x--)
 	{
-	     if(!strcmp(tabela_Simbolos[x].id, nome_funcao))	
+	     if(!strcmp(tabela_Simbolos[x].id, nome_funcao))
          {
          	if(strcmp(tabela_Simbolos[x].tipoVariavel,tipo_retorno_expr) != 0 ) modulo_erros((Erro)RETURN_EXPR_ERRO);
-		 }	
+		 }
 	}
 
 }
@@ -269,31 +294,31 @@ void pesquisar_assinatura(char tipo_recebido[],char id_recebido[],char parametro
             //Verifica se possui o mesmo id da assinatura
             if(!strcmp(tabela_Simbolos[x].id, id_recebido) && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO){ //verificar esta validação com Felipe
                 achou_id=1;
-				
+
                 //Tipo recebido não pode ser int (Lucas)
                 if(!strcmp(tabela_Simbolos[x].tipoVariavel, tipo_recebido)){  //Verifia se possui mesmo tipo de retorno da assinatura
 
-					strcpy(idAux1,id_recebido);	
+					strcpy(idAux1,id_recebido);
 					if(tabela_Simbolos[x].tipo != FUNCAO_PROTOTIPO)  //Para colocar mesma quantidade de parametros na funão da assinatura
-			 			addParamFunc(idAux1);  
-			 			
+			 			addParamFunc(idAux1);
+
                     //Verifica a quantidade de argumentos da assinatura em relação a func
                     if(tabela_Simbolos[x].qtd_param == num_parametros){
-						
-						
+
+
                         if(strcmp(parametros[0],"semparam") != 0){
 
                             //Verifica se os tipos dos argumentos da função são os mesmos da assinatura (Concertar aqui !!)
                             for(posicao_param_func=0; posicao_param_func < num_parametros; posicao_param_func++)
                             {
                             	addParamFunc2(idAux1, posicao_param_func);
-                            	
+
                                 if(strcmp(tabela_Simbolos[x].parametros[posicao_param_func],parametros[posicao_param_func]) != 0)
                                     modulo_erros((Erro)ARGUMENTO_INVALIDO_ERROR);
                             }
 
                         }
-                        
+
 
                     }else modulo_erros((Erro)QUANTIDADE_ARGUMENTOS_ERROR);
 
@@ -363,31 +388,31 @@ void verificar_param_func(char nome_funcao[], int num_parametros, char parametro
 void adicionar_label_Tabela(char id_[], char novo_label[])
 {
     int x;
-   
+
     for(x = topo_pilha - 1; x >= base_pilha; x--)
 	{
-	    if(!strcmp(tabela_Simbolos[x].id, id_)) 
+	    if(!strcmp(tabela_Simbolos[x].id, id_))
 			strcpy(tabela_Simbolos[x].label, novo_label);
     }
-		
+
 }
 
 //GERA CÓDIGO PARA CHAMADA DE FUNÇÃO
 void pesquisar_nome_func(char id_[])
 {
     int x;
-   
+
     for(x = topo_pilha - 1; x >= base_pilha; x--)
 	{
 		if(!strcmp(tabela_Simbolos[x].id, id_))
 		{
 		   //GERA CÓDIGO
-		   //fprintf(arquivo_gerador,"LDA %d,%d\n", tabela_Simbolos[x].escopo,tabela_Simbolos[x].deslocamento);     	
-		   fprintf(arquivo_gerador,"CALL %s\n", tabela_Simbolos[x].label);	
+		   //fprintf(arquivo_gerador,"LDA %d,%d\n", tabela_Simbolos[x].escopo,tabela_Simbolos[x].deslocamento);
+		   fprintf(arquivo_gerador,"CALL %s\n", tabela_Simbolos[x].label);
 		}
-				
+
 	}
-	  		
+
 }
 
 Boolean tem_principal(){

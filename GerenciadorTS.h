@@ -80,6 +80,8 @@ void listar_Tabela_Simbolos();
 //Geração de código.
 void addEnderecoRelativo(char id_[], Escopo escopo_, TipoSimbolo tipo_);
 
+void addEnderecoRelativoParametros(char id_[], Escopo escopo_, TipoSimbolo tipo_, int qtdParam);
+
 int retorna_endereco_relativo(char id_[]);
 
 int retorna_escopo(char id_[]);
