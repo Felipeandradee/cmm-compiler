@@ -88,5 +88,7 @@ void adicionar_label_Tabela(char [], char []);
 
 void pesquisar_nome_func(char []);
 
+Boolean tem_principal();
+
 #endif // GERENCIADOR_H_INCLUDED
 

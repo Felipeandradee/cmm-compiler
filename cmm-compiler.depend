@@ -21,12 +21,12 @@
 	<string.h>
 	"lexico.h"
 
-1510884632 source:c:\users\felip\codeblocksprojects\cmm-compiler\main.c
+1513216636 source:c:\users\felip\codeblocksprojects\cmm-compiler\main.c
 	<stdio.h>
 	<stdlib.h>
 	"AnaSint.h"
 
-1510885615 c:\users\felip\codeblocksprojects\cmm-compiler\anasint.h
+1513263480 c:\users\felip\codeblocksprojects\cmm-compiler\anasint.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -37,22 +37,23 @@
 	<stdio.h>
 	<stdlib.h>
 
-1510886120 c:\users\felip\codeblocksprojects\cmm-compiler\gerenciadorts.h
+1513263379 c:\users\felip\codeblocksprojects\cmm-compiler\gerenciadorts.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	"Analex.h"
 
-1510884632 source:c:\users\felip\codeblocksprojects\cmm-compiler\analex.c
+1513212600 source:c:\users\felip\codeblocksprojects\cmm-compiler\analex.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
 	"Analex.h"
 
-1510886120 source:c:\users\felip\codeblocksprojects\cmm-compiler\anasint.c
+1513263480 source:c:\users\felip\codeblocksprojects\cmm-compiler\anasint.c
 	"AnaSint.h"
 
-1510885161 source:c:\users\felip\codeblocksprojects\cmm-compiler\gerenciadorts.c
+1513263284 source:c:\users\felip\codeblocksprojects\cmm-compiler\gerenciadorts.c
 	"GerenciadorTS.h"
+	"AnaSint.h"
 

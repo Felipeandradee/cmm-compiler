@@ -134,7 +134,12 @@ void modulo_erros(Erro tipo_erro) {
 		case RETURN_EXPR_ERRO:
 			printf("\n\nERRO SEMANTICO NA LINHA %d, TIPO EM RETURN DIFERENTE DO TIPO EM FUNC!\n\n", linha);
             system("PAUSE");			 	
-			break;  
+			break;
+
+        case PRINCIPAL_ERROR:
+            printf("\n\nERRO SEMANTICO, O PROGRAMA NAO POSSUI UMA FUNCAO PRINCIPAL!\n\n", linha);
+            system("PAUSE");
+            break;
     }
 }
 
@@ -1184,7 +1189,10 @@ void prog() {
 //            contagem_parametros=0;
         }
     }
-	
+
+    if(!tem_principal())
+        modulo_erros((Erro) PRINCIPAL_ERROR);
+
 //GERA CÓDIGO (Verificar se este gerar codigo está correto)
 fprintf(arquivo_gerador, "DMEM %d\n",  num_var_prog);
 fprintf(arquivo_gerador, "HALT\n");

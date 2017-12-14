@@ -11,13 +11,13 @@
 typedef
    enum{ID_ERRO=1, TIPO_ERRO,ABERTURA_PARENTESE_ERRO,FECHAMENTO_PARENTESE_ERRO, ABERTURA_CHAVES_ERRO, FECHAMENTO_CHAVES_ERRO, EXPRESSAO_ERRO,
        FATOR_ERRO, TERMO_ERRO, EXPR_SIMP_ERRO, EXPR_ERRO, ATRIBUICAO_ERRO, VIRGULA_ERRO, PONTO_VIRGULA_ERRO,
-       //erros semânticos
+       //erros semï¿½nticos
        ASSINATURA_RETORNO_ERROR, QUANTIDADE_ARGUMENTOS_ERROR, ARGUMENTO_INVALIDO_ERROR, ID_NAO_ENCONTRADO_ERROR,
-       TIPO_INCOMPATIVEL_ERRO, RETURN_PROC_ERRO, RETURN_FUNC_ERRO, RETURN_EXPR_ERRO
+       TIPO_INCOMPATIVEL_ERRO, RETURN_PROC_ERRO, RETURN_FUNC_ERRO, RETURN_EXPR_ERRO, PRINCIPAL_ERROR
    }
 Erro;
 
-//Estrutura de funções e procedimentos que define: Tipo, Nome, Quantidade de parametros,etc.
+//Estrutura de funï¿½ï¿½es e procedimentos que define: Tipo, Nome, Quantidade de parametros,etc.
 typedef
    struct{
        char tipo[500];
@@ -27,7 +27,7 @@ typedef
        char parametros[20][8];
    } estrutura_fp;
 
-//Variaveis utilizadas para a comparação de tipos na analise semântica.
+//Variaveis utilizadas para a comparaï¿½ï¿½o de tipos na analise semï¿½ntica.
 char tipo_dado_1[15],tipo_dado_2[15], tipo_dado[15], tipo_retorno[15], tipo_retorno_func[15], nome_func[15];
 
 void verificar_consistencia_tipos(char tipo1[], char tipo2[]);
@@ -39,7 +39,7 @@ Boolean expr_simp();
 Boolean termo();
 void prog();
 
-//Geração de código
+//Geraï¿½ï¿½o de cï¿½digo
 FILE	*arquivo_gerador;
 
 char 	nome_label[8], label_num_s[50], label_letra[40];

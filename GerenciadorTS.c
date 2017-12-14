@@ -389,3 +389,19 @@ void pesquisar_nome_func(char id_[])
 	}
 	  		
 }
+
+Boolean tem_principal(){
+
+    int x;
+
+    for(x = topo_pilha - 1; x >= base_pilha; x--)
+    {
+        if(!strcmp(tabela_Simbolos[x].id, "principal"))
+        {
+            return TRUE;
+        }
+
+    }
+    return FALSE;
+
+}
