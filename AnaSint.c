@@ -199,6 +199,7 @@ void tipos_param() {
     } else {
         if (tipo()) {
             strcpy(assinatura_atual.parametros[posicao_parametros],tipo_id);
+            adicionar_Tipos_Param(posicao_parametros, tipo_id, assinatura_atual.id);
             posicao_parametros++;
             contagem_parametros++;
 
@@ -217,6 +218,7 @@ void tipos_param() {
 
                         if (tipo()) {
                             strcpy(assinatura_atual.parametros[posicao_parametros],tipo_id);
+                            adicionar_Tipos_Param(posicao_parametros, tipo_id, assinatura_atual.id);
                             posicao_parametros++;
                             contagem_parametros++;
 

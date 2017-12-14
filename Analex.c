@@ -419,6 +419,7 @@ void analexico() {
                     cont++;
                 } else{
                     montaToken(SN, "/", '\0', DIVISAO);
+                    ungetc(ch, fp);
                     return;
                 }
                 break;

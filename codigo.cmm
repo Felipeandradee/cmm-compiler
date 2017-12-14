@@ -31,7 +31,7 @@ inteiro contagem(inteiro a, real b, booleano c){
 }
 
 semretorno principal(semparam) {
-	inteiro y, i, delta, x1, x2;
+	inteiro y, i, delta, x1, x2, x3;
 
     se (a>b) {
       a=b / 5;
