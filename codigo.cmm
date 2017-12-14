@@ -1,4 +1,4 @@
-inteiro a, b, c;
+inteiro a, b, c, x, t;
 
 real d45;
 
@@ -8,6 +8,14 @@ booleano FIM;
 /* Comentario */
 
 caracter d;
+
+semretorno imprima(caracter d){
+	retorne;
+}
+
+inteiro sqrt(inteiro x){
+	retorne x;
+}
 
 prototipo inteiro contagem(inteiro, real, booleano);
 
@@ -22,8 +30,8 @@ inteiro contagem(inteiro a, real b, booleano c){
     retorne a;
 }
 
-
 semretorno principal(semparam) {
+	inteiro y, i, delta, x1, x2;
 
     se (a>b) {
       a=b / 5;

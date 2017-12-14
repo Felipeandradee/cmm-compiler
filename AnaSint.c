@@ -700,6 +700,8 @@ Boolean expr() {
 
         if(strcmp(tipo_dado_1, ""))
             verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
+        else
+            strcpy(tipo_retorno, tipo_dado_2);
 		
         if (op_rel()) {
             proximo_Token();
@@ -710,7 +712,10 @@ Boolean expr() {
 			gerador_Codigo_Expr(tipo_relacional);
 			   
             strcpy(tipo_dado_1,tipo_dado);
-            verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
+            if(strcmp(tipo_dado_1, ""))
+                verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
+            else
+                strcpy(tipo_retorno, tipo_dado_2);
         }
         return TRUE;
     }
@@ -1099,11 +1104,9 @@ void prog() {
                             
                             //GERA CÓDIGO
 	                        fprintf(arquivo_gerador, "AMEM %d\n", num_var);
-                            
-                            if(eh_semretorno)
-								proc_ = 1;
-							else
-								func_ = 1;	
+
+                            proc_ = eh_semretorno;
+                            func_ = !eh_semretorno;
 
                             enquanto_for_comando = 1;
                             while (enquanto_for_comando) {
