@@ -251,6 +251,7 @@ void adicionar_Tipos_Param(int posicao_parametro , char tipo_Param[], char id_[]
           if(!strcmp(tabela_Simbolos[x].id, id_))
      	  {
              strcpy(tabela_Simbolos[x].parametros[posicao_parametro], tipo_Param);
+              return;
 	      }
 
 	 }

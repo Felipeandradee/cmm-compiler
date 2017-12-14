@@ -55,6 +55,7 @@ void    gera_codigo_Igualdade();
 
 void	abrir_Arquivo_Gerador();
 void    fechar_Arquivo_Gerador();
+void    gerador_Codigo_Expr(int condicao);
 
 #endif // SINTATICO_H_INCLUDED
 
