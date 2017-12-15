@@ -19,6 +19,7 @@ int result;
 int label = 0, num_label;
 int num_var = 0; //Contagem de número de variaveis usadas ao logo do programa
 int tipo_relacional;
+int num_label_goto = 0; //Variavel para armazenar o número da label do GOTO, para colocar no rotulo depois que ele temrina as funções (RET)
 
 void proximo_Token() {
     Token = TNext;
@@ -541,6 +542,15 @@ void cmd() {
 
 				fprintf(arquivo_gerador,"STOR %d,%d\n", 1, -3 -contagem_parametros_mp);
 				fprintf(arquivo_gerador,"RET %d,%d\n", 1,contagem_parametros_mp);
+				
+				//Gera código Label (Goto Lx, Label lx)
+				strcpy(nome_label, "LABEL ");
+				sprintf(label_num_s, "%i", num_label_goto);
+				strcpy(label_letra, "L");
+				strcat(label_letra, label_num_s);
+				strcat(nome_label, label_letra);
+				strcat(nome_label, "\n");
+				fprintf(arquivo_gerador,nome_label);
 
                 if (!(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA))
                     modulo_erros((Erro) PONTO_VIRGULA_ERRO);
@@ -1049,6 +1059,9 @@ void prog() {
 					strcat(nome_label, label_letra);
 					strcat(nome_label, "\n");
 					fprintf(arquivo_gerador,nome_label);
+					
+					//Armazenando Label do GOTO, para colocar no Rotulo depois que ele gerou código de RET.
+				 	num_label_goto = num_label;
 
 					//label (Rotulo da função)
 					strcpy(nome_label, "LABEL ");
@@ -1101,7 +1114,7 @@ void prog() {
                                 if (Token.cat == ID) {
                                     pesquisar_Tabela_Simbolos(Token.tipo.lexema, LOCAL, VARIAVEL);
                                     adicionar_Tabela_Simbolos(Token.tipo.lexema, tipo_id, LOCAL, VARIAVEL);
-                                     addEnderecoRelativo(Token.tipo.lexema, LOCAL, VARIAVEL);
+                                    addEnderecoRelativo(Token.tipo.lexema, LOCAL, VARIAVEL);
                                 	num_var++;
 
                                     proximo_Token();
@@ -1151,9 +1164,23 @@ void prog() {
 						//GERA CÓDIGO
 						if(num_var != 0)
 	       					fprintf(arquivo_gerador, "DMEM %d\n", num_var);    //Utilizado para representar as variaveis locais.
-
+					
 						num_var=0;
-
+						
+						if(eh_semretorno){
+							//Gera código RET
+							fprintf(arquivo_gerador,"RET %d,%d\n", 1,0);
+							
+							//Gera código Label
+							strcpy(nome_label, "LABEL ");
+							sprintf(label_num_s, "%i", num_label_goto);
+							strcpy(label_letra, "L");
+							strcat(label_letra, label_num_s);
+							strcat(nome_label, label_letra);
+							strcat(nome_label, "\n");
+							fprintf(arquivo_gerador,nome_label);
+						}
+						
 						} else {
                             modulo_erros((Erro) ABERTURA_CHAVES_ERRO);
                         }
@@ -1213,15 +1240,17 @@ void prog() {
 //            adicionar_qtd_param(contagem_parametros, nome_func);
 //            contagem_parametros=0;
         }
-    }
-
-    //GERA CÓDIGO
-    if(num_var_prog != 0)
-        fprintf(arquivo_gerador, "DMEM %d\n",  num_var_prog);
+    }   
 
     if(!tem_principal())
         modulo_erros((Erro) PRINCIPAL_ERROR);
-
+    else
+		pesquisar_nome_func("principal");
+        
+	 //GERA CÓDIGO
+    if(num_var_prog != 0)
+        fprintf(arquivo_gerador, "DMEM %d\n",  num_var_prog);
+        
 fprintf(arquivo_gerador, "HALT\n");
 
 fechar_Arquivo_Gerador();
