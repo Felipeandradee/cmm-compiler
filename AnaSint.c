@@ -20,7 +20,8 @@ int label = 0, num_label;
 int num_var = 0; //Contagem de número de variaveis usadas ao logo do programa
 int tipo_relacional;
 int num_label_goto = 0; //Variavel para armazenar o número da label do GOTO, para colocar no rotulo depois que ele temrina as funções (RET)
-
+int num_label_gotrue = 0;
+int num_label_gofalse=0;
 void proximo_Token() {
     Token = TNext;
     if (Token.cat != END)
@@ -594,6 +595,7 @@ void cmd() {
 Boolean termo() {
     int mult, div;
     char controle_fluxo[8];
+    int ee = FALSE;
 
 	if (fator()) {
 
@@ -609,21 +611,36 @@ Boolean termo() {
         while ((Token.cat == SN && Token.tipo.codigo == MULTIPLICACAO) ||
                (Token.cat == SN && Token.tipo.codigo == DIVISAO) || (Token.cat == SN && Token.tipo.codigo == AND)) {
 
+
 		   if(Token.cat == SN && Token.tipo.codigo == AND){
-            	//Gera Código (Ver como vai ficar  questão do label no final)
+            	//Gera Código
 				fprintf(arquivo_gerador,"COPY\n");
-   				strcpy(controle_fluxo, "GOFALSE ");
-   				gera_Label(controle_fluxo);
+   				if(!ee){
+   					strcpy(controle_fluxo, "GOFALSE ");
+   					gera_Label(controle_fluxo);
+   					num_label_gofalse = num_label;
+				}else{
+					strcpy(nome_label, "GOFALSE ");
+   					sprintf(label_num_s, "%i", num_label_gofalse);
+  					strcpy(label_letra, "L");
+  					strcat(label_letra, label_num_s);
+  					strcat(nome_label, label_letra);
+  					strcat(nome_label, "\n");
+  					fprintf(arquivo_gerador,nome_label);
+				}
    				fprintf(arquivo_gerador,"POP\n");
 
    				mult = FALSE;
    				div = FALSE;
+   				ee = TRUE;
 			}
-
+		
 		    proximo_Token();
 
             if (!fator())
                 modulo_erros((Erro) FATOR_ERRO);
+                
+            strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
 
             //GERA CÓDIGO	 //Instrução aritimetica simples
 			if(mult){
@@ -643,6 +660,18 @@ Boolean termo() {
 			}
 
         }
+        
+        if(ee){
+			strcpy(nome_label, "LABEL ");
+			sprintf(label_num_s, "%i", num_label_gofalse);
+  			strcpy(label_letra, "L");
+  			strcat(label_letra, label_num_s);
+  			strcat(nome_label, label_letra);
+  			strcat(nome_label, "\n");
+  			fprintf(arquivo_gerador,nome_label);
+		
+		}
+		
         return TRUE;
     }
     return FALSE;
@@ -650,6 +679,7 @@ Boolean termo() {
 
 Boolean expr_simp() {
     int add, sub; //Variaveis usadas para indicar se é soma ou subtração.
+    int ou = FALSE;
 	char controle_fluxo[8];
 
 	if ((Token.cat == SN && Token.tipo.codigo == SOMA) || (Token.cat == SN && Token.tipo.codigo == SUBTRACAO))
@@ -671,21 +701,37 @@ Boolean expr_simp() {
                Token.cat == SN && Token.tipo.codigo == OR) {
 
             if(Token.cat == SN && Token.tipo.codigo == OR){
-            	//Gera Código (Ver como vai ficar  questão do label no final)
+            	//Gera Código
 				fprintf(arquivo_gerador,"COPY\n");
    				strcpy(controle_fluxo, "GOTRUE ");
-   				gera_Label(controle_fluxo);
+   				
+   				if(!ou){
+   					gera_Label(controle_fluxo);
+   					num_label_gotrue = num_label;
+				}else{
+					strcpy(nome_label, "GOTRUE ");
+   					sprintf(label_num_s, "%i", num_label_gotrue);
+  					strcpy(label_letra, "L");
+  					strcat(label_letra, label_num_s);
+  					strcat(nome_label, label_letra);
+  					strcat(nome_label, "\n");
+  					fprintf(arquivo_gerador,nome_label);
+				}
+				
    				fprintf(arquivo_gerador,"POP\n");
 
    				add = FALSE;
    				sub = FALSE;
+   				ou = TRUE;
 			}
-
+			
 			proximo_Token();
 
             if (!termo())
                 modulo_erros((Erro) TERMO_ERRO);
 
+			//strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
+			
 			//GERA CÓDIGO	 //Instrução aritimetica simples
 			if(add){
 				if(!strcmp(tipo_dado, "real")){
@@ -705,6 +751,17 @@ Boolean expr_simp() {
 			}
 
         }
+        
+        if(ou){
+			strcpy(nome_label, "LABEL ");
+			sprintf(label_num_s, "%i", num_label_gotrue);
+  			strcpy(label_letra, "L");
+  			strcat(label_letra, label_num_s);
+  			strcat(nome_label, label_letra);
+  			strcat(nome_label, "\n");
+  			fprintf(arquivo_gerador,nome_label);
+		
+		}
         return TRUE;
     }
     return FALSE;
@@ -850,14 +907,30 @@ Boolean fator() {
         //Gera Código
 		strcpy(controle_fluxo, "GOFALSE ");
 		gera_Label(controle_fluxo);
+		num_label_gofalse = num_label;
+		
 		fprintf(arquivo_gerador,"PUSH %d\n", 0);
 		strcpy(controle_fluxo, "GOTO ");
 		gera_Label(controle_fluxo);
+		num_label_goto = num_label;
+		
 		strcpy(nome_label, "LABEL ");
-		gera_Label(nome_label);
+		sprintf(label_num_s, "%i", num_label_gofalse);
+ 		strcpy(label_letra, "L");
+  		strcat(label_letra, label_num_s);
+  		strcat(nome_label, label_letra);
+  		strcat(nome_label, "\n");
+  		fprintf(arquivo_gerador,nome_label);
+		
 		fprintf(arquivo_gerador,"PUSH %d\n", 1);
+		
 		strcpy(nome_label, "LABEL ");
-		gera_Label(nome_label);
+		sprintf(label_num_s, "%i", num_label_goto);
+  		strcpy(label_letra, "L");
+  		strcat(label_letra, label_num_s);
+  		strcat(nome_label, label_letra);
+  		strcat(nome_label, "\n");
+  		fprintf(arquivo_gerador,nome_label);
 
         return TRUE;
     }
@@ -1208,12 +1281,12 @@ void prog() {
 						//GERA CÓDIGO
 	                    if(Token.cat == SN && Token.tipo.codigo == PONTO_VIRGULA){
 							fprintf(arquivo_gerador, "AMEM %d\n", num_var);
-	                   		label++;
-	                    	num_label=label;
-	                    	sprintf(label_num_s, "%i", num_label);
-	                    	strcpy(label_letra, "L");
-	                    	strcat(label_letra, label_num_s);
-	                    	fprintf(arquivo_gerador, "GO TO %s\n", label_letra);
+	                   		//label++;
+	                    	//num_label=label;
+	                    	//sprintf(label_num_s, "%i", num_label);
+	                    	//strcpy(label_letra, "L");
+	                    	//strcat(label_letra, label_num_s);
+	                    	//fprintf(arquivo_gerador, "GO TO %s\n", label_letra);
 	                    	num_var_prog = num_var;
 
 							num_var=0;
@@ -1309,19 +1382,60 @@ void gera_codigo_Maior_Igual()
 	fprintf(arquivo_gerador,"COPY\n");
 	strcpy(controle_fluxo, "GOTRUE ");
 	gera_Label(controle_fluxo);
+	num_label_gotrue = num_label;
+	
 	strcpy(controle_fluxo, "GOFALSE ");
 	gera_Label(controle_fluxo);
+	num_label_gofalse = num_label;
+	
 	fprintf(arquivo_gerador,"PUSH %d\n", 0);
 	strcpy(controle_fluxo, "GOTO ");
 	gera_Label(controle_fluxo);
+	num_label_goto = num_label;
+	
 	strcpy(nome_label, "LABEL ");
-	gera_Label(nome_label);
-	fprintf(arquivo_gerador,"POP\n");
-	strcpy(nome_label, "LABEL ");
-	gera_Label(nome_label);
+		fprintf(arquivo_gerador,"SUB\n");
+	fprintf(arquivo_gerador,"COPY\n");
+	strcpy(controle_fluxo, "GOFALSE ");
+	gera_Label(controle_fluxo);
+	num_label_gofalse = num_label;
+	
+	strcpy(controle_fluxo, "GOTRUE ");
+	gera_Label(controle_fluxo);
+	num_label_gotrue = num_label;
+	
 	fprintf(arquivo_gerador,"PUSH %d\n", 1);
+	strcpy(controle_fluxo, "GOTO ");
+	gera_Label(controle_fluxo);
+	num_label_goto = num_label;
+	
+	strcpy(nome_label, "LABEL ");	
+    sprintf(label_num_s, "%i", num_label_gotrue);
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
+	
+	fprintf(arquivo_gerador,"POP\n");
+	
 	strcpy(nome_label, "LABEL ");
-	gera_Label(nome_label);
+	sprintf(label_num_s, "%i", num_label_gofalse); //VER PQ ESSE DIABO TÁ COLOCANDO 0
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
+	
+	fprintf(arquivo_gerador,"PUSH %d\n", 0);
+	
+	strcpy(nome_label, "LABEL ");
+	sprintf(label_num_s, "%i", num_label_goto);
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
 }
 
 void gera_codigo_Menor_Igual()
@@ -1331,54 +1445,109 @@ void gera_codigo_Menor_Igual()
    fprintf(arquivo_gerador,"SUB\n");
    strcpy(controle_fluxo, "GOTRUE ");
    gera_Label(controle_fluxo);
+   num_label_gotrue = num_label;
+   
    fprintf(arquivo_gerador,"PUSH %d\n", 1);
    strcpy(controle_fluxo, "GOTO ");
    gera_Label(controle_fluxo);
+   num_label_goto = num_label;
+   
    strcpy(nome_label, "LABEL ");
-   gera_Label(nome_label);
+   sprintf(label_num_s, "%i", num_label_gotrue);
+   strcpy(label_letra, "L");
+   strcat(label_letra, label_num_s);
+   strcat(nome_label, label_letra);
+   strcat(nome_label, "\n");
+   fprintf(arquivo_gerador,nome_label);
+   
    fprintf(arquivo_gerador,"PUSH %d\n", 0);
    strcpy(nome_label, "LABEL ");
-   gera_Label(nome_label);
+    sprintf(label_num_s, "%i", num_label_goto);
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
 }
 
 void gera_codigo_Maior()
 {
   char controle_fluxo[8];
-
+  
   fprintf(arquivo_gerador,"SUB\n");
   strcpy(controle_fluxo, "GOTRUE ");
   gera_Label(controle_fluxo);
+  num_label_gotrue = num_label;
+    
   fprintf(arquivo_gerador,"PUSH %d\n", 0);
   strcpy(controle_fluxo, "GOTO ");
   gera_Label(controle_fluxo);
+  num_label_goto = num_label;
+  
   strcpy(nome_label, "LABEL ");
-  gera_Label(nome_label);
+  sprintf(label_num_s, "%i", num_label_gotrue);
+  strcpy(label_letra, "L");
+  strcat(label_letra, label_num_s);
+  strcat(nome_label, label_letra);
+  strcat(nome_label, "\n");
+  fprintf(arquivo_gerador,nome_label);
+  
   fprintf(arquivo_gerador,"PUSH %d\n", 1);
   strcpy(nome_label, "LABEL ");
-  gera_Label(nome_label);
+  sprintf(label_num_s, "%i", num_label_goto);
+  strcpy(label_letra, "L");
+  strcat(label_letra, label_num_s);
+  strcat(nome_label, label_letra);
+  strcat(nome_label, "\n");
+  fprintf(arquivo_gerador,nome_label);
 }
 
 void gera_codigo_Menor()
 {
     char controle_fluxo[8];
-
+    
 	fprintf(arquivo_gerador,"SUB\n");
 	fprintf(arquivo_gerador,"COPY\n");
 	strcpy(controle_fluxo, "GOFALSE ");
 	gera_Label(controle_fluxo);
+	num_label_gofalse = num_label;
+	
 	strcpy(controle_fluxo, "GOTRUE ");
 	gera_Label(controle_fluxo);
+	num_label_gotrue = num_label;
+	
 	fprintf(arquivo_gerador,"PUSH %d\n", 1);
 	strcpy(controle_fluxo, "GOTO ");
 	gera_Label(controle_fluxo);
-	strcpy(nome_label, "LABEL ");
-	gera_Label(nome_label);
+	num_label_goto = num_label;
+	
+	strcpy(nome_label, "LABEL ");	
+    sprintf(label_num_s, "%i", num_label_gofalse);
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
+	
 	fprintf(arquivo_gerador,"POP\n");
+	
 	strcpy(nome_label, "LABEL ");
-	gera_Label(nome_label);
+	sprintf(label_num_s, "%i", num_label_gotrue); //VER PQ ESSE DIABO TÁ COLOCANDO 0
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
+	
 	fprintf(arquivo_gerador,"PUSH %d\n", 0);
+	
 	strcpy(nome_label, "LABEL ");
-	gera_Label(nome_label);
+	sprintf(label_num_s, "%i", num_label_goto);
+    strcpy(label_letra, "L");
+    strcat(label_letra, label_num_s);
+    strcat(nome_label, label_letra);
+    strcat(nome_label, "\n");
+    fprintf(arquivo_gerador,nome_label);
 
 }
 
@@ -1387,16 +1556,31 @@ void gera_codigo_Diferente()
    char controle_fluxo[8];
 
    fprintf(arquivo_gerador,"SUB\n");
-   strcpy(controle_fluxo, "GOFALSE ");
+   strcpy(controle_fluxo, "GOTRUE ");
    gera_Label(controle_fluxo);
+   num_label_gotrue = num_label;
+   
    fprintf(arquivo_gerador,"PUSH %d\n", 1);
    strcpy(controle_fluxo, "GOTO ");
    gera_Label(controle_fluxo);
+   num_label_goto = num_label;
+   
    strcpy(nome_label, "LABEL ");
-   gera_Label(nome_label);
+   sprintf(label_num_s, "%i", num_label_gotrue);
+   strcpy(label_letra, "L");
+   strcat(label_letra, label_num_s);
+   strcat(nome_label, label_letra);
+   strcat(nome_label, "\n");
+   fprintf(arquivo_gerador,nome_label);
+   
    fprintf(arquivo_gerador,"PUSH %d\n", 0);
    strcpy(nome_label, "LABEL ");
-   gera_Label(nome_label);
+   sprintf(label_num_s, "%i", num_label_goto);
+   strcpy(label_letra, "L");
+   strcat(label_letra, label_num_s);
+   strcat(nome_label, label_letra);
+   strcat(nome_label, "\n");
+   fprintf(arquivo_gerador,nome_label);
 }
 
 void gera_codigo_Igualdade()
@@ -1406,14 +1590,29 @@ void gera_codigo_Igualdade()
    fprintf(arquivo_gerador,"SUB\n");
    strcpy(controle_fluxo, "GOFALSE ");
    gera_Label(controle_fluxo);
+   num_label_gofalse = num_label;
+   
    fprintf(arquivo_gerador,"PUSH %d\n", 0);
    strcpy(controle_fluxo, "GOTO ");
    gera_Label(controle_fluxo);
+   num_label_goto = num_label;
+   
    strcpy(nome_label, "LABEL ");
-   gera_Label(nome_label);
+   sprintf(label_num_s, "%i", num_label_gofalse);
+   strcpy(label_letra, "L");
+   strcat(label_letra, label_num_s);
+   strcat(nome_label, label_letra);
+   strcat(nome_label, "\n");
+   fprintf(arquivo_gerador,nome_label);
+   
    fprintf(arquivo_gerador,"PUSH %d\n", 1);
    strcpy(nome_label, "LABEL ");
-   gera_Label(nome_label);
+   sprintf(label_num_s, "%i", num_label_goto);
+   strcpy(label_letra, "L");
+   strcat(label_letra, label_num_s);
+   strcat(nome_label, label_letra);
+   strcat(nome_label, "\n");
+   fprintf(arquivo_gerador,nome_label);
 }
 
 void gera_Label(char controle_fluxo[])
