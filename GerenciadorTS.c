@@ -131,18 +131,13 @@ void declarado_na_tabela_simbolos(char id_[]) {
 
 }
 
-int pesquisar_Tipo(char id_[], TipoSimbolo tipo_) {
+int pesquisar_Tipo(char id_[]) {
     int caracter, inteiro, real;
 
 	int x;
 
     for (x = topo_pilha - 1; x >= base_pilha; x--) {
-        if (!strcmp(tabela_Simbolos[x].id, id_) /*&& tabela_Simbolos[x].zumbi == FALSE
-            && tabela_Simbolos[x].tipo != PARAMETRO*/) {
-            /*if (tipo_ == FUNCAO && tabela_Simbolos[x].tipo == FUNCAO_PROTOTIPO)
-                continue;
-                */
-
+        if (!strcmp(tabela_Simbolos[x].id, id_)) {
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "inteiro")){
 				inteiro = 1;
             	return inteiro;

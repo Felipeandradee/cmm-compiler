@@ -10,10 +10,8 @@ int contagem_parametros_mp = 0; //Variavel que indica a quantidade de parametros
 
 int proc_=0, func_=0; //Variaveis que indica se é procedimento ou função, para da erro semântico no retorno.
 
-//Analisar a condição dessas variaveis, são utilizadas na analise semântica e na tabela de simbolos
-int  posicao_fixa=0;
-int  posicao_atual=0;
 int result;
+Boolean tem_retorne = FALSE;
 
 //Variaveis usadas para geração de código.
 int label = 0, num_label;
@@ -131,7 +129,12 @@ void modulo_erros(Erro tipo_erro) {
 			break;
 
 		case RETURN_FUNC_ERRO:
-			printf("\n\nERRO SEMANTICO NA LINHA %d, FUNC NAO PODE TER RETURN PURO!\n\n", linha);
+			printf("\n\nERRO SEMANTICO NA LINHA %d, FUNC NAO PODE TER RETURNE PURO!\n\n", linha);
+            system("PAUSE");
+			break;
+
+		case SEMRETURN_FUNC_ERRO:
+			printf("\n\nERRO SEMANTICO NA LINHA %d, A FUNCAO PRECISA DE RETORNE!\n\n", linha);
             system("PAUSE");
 			break;
 
@@ -141,7 +144,7 @@ void modulo_erros(Erro tipo_erro) {
 			break;
 
         case PRINCIPAL_ERROR:
-            printf("\n\nERRO SEMANTICO, O PROGRAMA NAO POSSUI UMA FUNCAO PRINCIPAL!\n\n", linha);
+            printf("\n\nERRO SEMANTICO, O PROGRAMA NAO POSSUI UMA FUNCAO PRINCIPAL!\n\n");
             system("PAUSE");
             break;
     }
@@ -177,7 +180,7 @@ void atrib() {
 
 	if (Token.cat == ID) {
         declarado_na_tabela_simbolos(Token.tipo.lexema);
-        result = pesquisar_Tipo(Token.tipo.lexema, VARIAVEL);
+        result = pesquisar_Tipo(Token.tipo.lexema);
 
 		proximo_Token();
 
@@ -267,7 +270,7 @@ contagem_parametros_mp = contagem_parametros;
 contagem_parametros=0;
 }
 
-//Colocar erro em semparam?? Verificar a gramática com Felipe.
+
 void tipos_p_opc() {
 
     if (Token.cat == PR && Token.tipo.codigo == SEMPARAM) {
@@ -275,7 +278,7 @@ void tipos_p_opc() {
 		proximo_Token();
     } else {
         if (tipo()) {
-        	//strcpy(assinatura_atual.parametros[posicao_parametros],Token.tipo.lexema);
+
 			adicionar_Tipos_Param(posicao_parametros, tipo_id, assinatura_atual.id);
 			posicao_parametros++;
 			contagem_parametros++;
@@ -325,14 +328,12 @@ void tipos_p_opc() {
         }
     }
 posicao_parametros=0;
-//if(!tipo_proc) pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,1,contagem_parametros);
-//else {pesquisar_assinatura(assinatura_atual.tipo,assinatura_atual.id,assinatura_atual.parametros,0,contagem_parametros);}
 
 }
 
 void cmd() {
     Boolean enquanto_for_virgula = TRUE;
-    char id_[15], id_declaracao[15];  //Analise semântica
+    char id_declaracao[15];  //Analise semântica
     char controle_fluxo[8]; //geração de códugo.
 
     if (Token.cat == ID && TNext.cat == SN && TNext.tipo.codigo == ATRIBUICAO) {
@@ -525,14 +526,15 @@ void cmd() {
                 break;
 
                 //retorne
-            case RETORNE:   //Ver a quest?o do permitir por cadeia vazia e fazer a quest?o do ponto e virgula
+            case RETORNE:
+                tem_retorne = TRUE;
                 proximo_Token();
 				strcpy(id_declaracao, Token.tipo.lexema);  //Está copiando o id, para depois achar o tipo de retorno.
 
                 if(expr()){
                 	if(proc_)
 						modulo_erros((Erro)RETURN_PROC_ERRO);
-                }else {
+                } else {
 					if(func_)
 						modulo_erros((Erro)RETURN_FUNC_ERRO);
                     else strcpy(tipo_retorno, "");
@@ -817,7 +819,7 @@ Boolean fator() {
         strcpy(id_, Token.tipo.lexema);
 
         declarado_na_tabela_simbolos(id_);
-        result = pesquisar_Tipo(Token.tipo.lexema, VARIAVEL);
+        result = pesquisar_Tipo(Token.tipo.lexema);
 
         proximo_Token();
 
@@ -1015,6 +1017,7 @@ void prog() {
 	abrir_Arquivo_Gerador();
 
     int num_var_prog = 0;
+    tem_retorne = FALSE;
 
 	//GERA CÓDIGO
 	fprintf(arquivo_gerador, "INIP\n");  //Inicio do programa
@@ -1229,6 +1232,10 @@ void prog() {
                                 cmd();
                             }
 
+                            if(!eh_semretorno && !tem_retorne){
+                                modulo_erros((Erro) SEMRETURN_FUNC_ERRO);
+                            }
+
                             if (!(Token.cat == SN && Token.tipo.codigo == FECHA_CHAVES)) {
                                 modulo_erros((Erro) FECHAMENTO_CHAVES_ERRO);
                             } else
@@ -1331,15 +1338,13 @@ fechar_Arquivo_Gerador();
 
 //Erros semânticos
 
-//Revisar essa estrutura da assinatura posteriormente
-//Compara a assinatura da função e procedimento com suas devidas definições
 
 void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
 	int tipo_dado;
 
 	if(!strcmp(tipo1, "inteiro"))  tipo_dado=1;
-	if(!strcmp(tipo1, "caracter")) tipo_dado=2;
-	if(!strcmp(tipo1, "real")) tipo_dado=3;
+	else if(!strcmp(tipo1, "caracter")) tipo_dado=2;
+	else if(!strcmp(tipo1, "real")) tipo_dado=3;
 
 	switch(tipo_dado){
 	//INT
@@ -1369,7 +1374,7 @@ void verificar_consistencia_tipos(char tipo1[], char tipo2[]){
 			if(strcmp(tipo2,"") != 0){modulo_erros((Erro)TIPO_INCOMPATIVEL_ERRO);}
 					strcpy(tipo_retorno, "");
 
-				break;
+        break;
 	}
 }
 
