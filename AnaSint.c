@@ -689,6 +689,16 @@ Boolean expr_simp() {
 
     if (termo()) {
 
+        if(result == 1)
+            strcpy(tipo_dado_1,"inteiro");
+        else if(result == 2)
+            strcpy(tipo_dado_1,"caracter");
+        else if(result == 3)
+            strcpy(tipo_dado_1,"real");
+        else
+            strcpy(tipo_dado_1,"");
+
+
 		if(Token.cat == SN && Token.tipo.codigo == SOMA){
     		add = TRUE;
     		sub = FALSE;
@@ -731,6 +741,17 @@ Boolean expr_simp() {
 
             if (!termo())
                 modulo_erros((Erro) TERMO_ERRO);
+
+            if(result == 1)
+                strcpy(tipo_dado_2,"inteiro");
+            else if(result == 2)
+                strcpy(tipo_dado_2,"caracter");
+            else if(result == 3)
+                strcpy(tipo_dado_2,"real");
+            else
+                strcpy(tipo_dado_2,"");
+
+            verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
 
 			//strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
 			
