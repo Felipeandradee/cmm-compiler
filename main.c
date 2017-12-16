@@ -6,8 +6,8 @@ int main() {
 
     //Caminho de teste de Felipe
 //    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\fibonacci.cmm";
-    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\codigo.cmm";
-//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\TESTE.txt";
+//    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\codigo.cmm";
+    char nome_arquivo_in[10000] = "C:\\Users\\felip\\CodeBlocksProjects\\cmm-compiler\\TESTE.txt";
     //Caminho de testes de Lucas
 //    char nome_arquivo_in[10000] = "C:\\Users\\Luck\\Desktop\\GItHub\\cmm-compiler\\TESTE.txt";
 

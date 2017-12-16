@@ -642,7 +642,7 @@ Boolean termo() {
             if (!fator())
                 modulo_erros((Erro) FATOR_ERRO);
                 
-            strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
+//            strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
 
             //GERA CÓDIGO	 //Instrução aritimetica simples
 			if(mult){
@@ -753,7 +753,7 @@ Boolean expr_simp() {
 
             verificar_consistencia_tipos(tipo_dado_1, tipo_dado_2);
 
-			//strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
+//			strcpy(tipo_dado_2, tipo_dado); //Consertar problema no return
 			
 			//GERA CÓDIGO	 //Instrução aritimetica simples
 			if(add){
@@ -966,6 +966,7 @@ Boolean fator() {
 		proximo_Token();
 
         strcpy(tipo_dado, "inteiro"); //Copia para comparação de tipos na analise semântica
+        result = 1;
         return TRUE;
     }
 
@@ -977,6 +978,7 @@ Boolean fator() {
 		proximo_Token();
 
         strcpy(tipo_dado, "real");
+        result = 3;
         return TRUE;
     }
 
@@ -985,6 +987,7 @@ Boolean fator() {
         proximo_Token();
 
         strcpy(tipo_dado, "caracter");
+        result = 2;
         return TRUE;
     }
 

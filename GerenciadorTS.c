@@ -140,16 +140,19 @@ int pesquisar_Tipo(char id_[]) {
         if (!strcmp(tabela_Simbolos[x].id, id_)) {
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "inteiro")){
 				inteiro = 1;
+                strcpy(tipo_dado, "inteiro");
             	return inteiro;
 			}
 
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "caracter")){
             	caracter = 2;
+                strcpy(tipo_dado, "caracter");
             	return caracter;
 			}
 
             if(!strcmp(tabela_Simbolos[x].tipoVariavel, "real")){
             	real = 3;
+                strcpy(tipo_dado, "real");
             	return real;
 			}
 
